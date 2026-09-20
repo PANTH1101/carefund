@@ -24,6 +24,16 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
 
+// Configure application cookie
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Account/Login";
+    options.LogoutPath = "/Account/Logout";
+    options.AccessDeniedPath = "/Account/AccessDenied";
+    options.ExpireTimeSpan = TimeSpan.FromDays(30);
+    options.SlidingExpiration = true;
+});
+
 // Add MVC
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
@@ -42,6 +52,55 @@ using (var scope = app.Services.CreateScope())
         if (!await roleManager.RoleExistsAsync(role))
         {
             await roleManager.CreateAsync(new IdentityRole(role));
+        }
+    }
+}
+
+// Seed Admin user
+using (var scope = app.Services.CreateScope())
+{
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+    var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+
+    // Read Admin credentials from configuration (User Secrets)
+    var adminEmail = configuration["Admin:Email"];
+    var adminPassword = configuration["Admin:Password"];
+
+    // Validate that Admin credentials are configured
+    if (string.IsNullOrWhiteSpace(adminEmail))
+    {
+        throw new InvalidOperationException("Admin:Email is not configured. Please set it using User Secrets: dotnet user-secrets set \"Admin:Email\" \"your-email@example.com\"");
+    }
+
+    if (string.IsNullOrWhiteSpace(adminPassword))
+    {
+        throw new InvalidOperationException("Admin:Password is not configured. Please set it using User Secrets: dotnet user-secrets set \"Admin:Password\" \"your-secure-password\"");
+    }
+
+    // Check if Admin user already exists
+    var adminUser = await userManager.FindByEmailAsync(adminEmail);
+
+    if (adminUser == null)
+    {
+        // Create new Admin user
+        adminUser = new ApplicationUser
+        {
+            UserName = adminEmail,
+            Email = adminEmail,
+            FullName = "CareFund Admin",
+            EmailConfirmed = true
+        };
+
+        var result = await userManager.CreateAsync(adminUser, adminPassword);
+
+        if (result.Succeeded)
+        {
+            // Assign Admin role
+            await userManager.AddToRoleAsync(adminUser, "Admin");
+        }
+        else
+        {
+            throw new InvalidOperationException($"Failed to create Admin user: {string.Join(", ", result.Errors.Select(e => e.Description))}");
         }
     }
 }

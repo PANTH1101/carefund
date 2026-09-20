@@ -1,0 +1,197 @@
+@model NGODonationSystem.Models.NGO
+@{
+    ViewData["Title"] = "NGO Details - " + Model.Name;
+}
+
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col">
+            <a asp-action="NGOs" class="btn btn-outline-secondary mb-3">
+                <i class="bi bi-arrow-left"></i> Back to NGO List
+            </a>
+            <h2>NGO Verification Details</h2>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="row">
+        <!-- NGO Information -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">NGO Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-4 fw-bold">NGO Name:</div>
+                        <div class="col-md-8">@Model.Name</div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4 fw-bold">Description:</div>
+                        <div class="col-md-8">@Model.Description</div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4 fw-bold">Contact Information:</div>
+                        <div class="col-md-8">
+                            <pre class="mb-0">@Model.ContactInformation</pre>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4 fw-bold">Verification Status:</div>
+                        <div class="col-md-8">
+                            @if (Model.VerificationStatus == "Approved")
+                            {
+                                <span class="badge bg-success fs-6">Approved</span>
+                            }
+                            else if (Model.VerificationStatus == "Rejected")
+                            {
+                                <span class="badge bg-danger fs-6">Rejected</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning text-dark fs-6">Pending</span>
+                            }
+                        </div>
+                    </div>
+
+                    @if (Model.Logo != null)
+                    {
+                        <div class="row mb-3">
+                            <div class="col-md-4 fw-bold">Logo:</div>
+                            <div class="col-md-8">
+                                <img src="data:@Model.LogoContentType;base64,@Convert.ToBase64String(Model.Logo)" 
+                                     alt="NGO Logo" 
+                                     class="img-thumbnail" 
+                                     style="max-width: 300px; max-height: 300px;" />
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Account Information -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Account Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-4 fw-bold">Full Name:</div>
+                        <div class="col-md-8">@Model.User.FullName</div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4 fw-bold">Email:</div>
+                        <div class="col-md-8">@Model.User.Email</div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4 fw-bold">Phone Number:</div>
+                        <div class="col-md-8">@(Model.User.PhoneNumber ?? "Not provided")</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Verification Documents -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">Verification Documents (@Model.Documents.Count)</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.Documents.Any())
+                    {
+                        <div class="list-group">
+                            @foreach (var doc in Model.Documents)
+                            {
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <i class="bi bi-file-earmark-text"></i>
+                                        <strong>@doc.FileName</strong>
+                                        <br />
+                                        <small class="text-muted">@doc.ContentType</small>
+                                    </div>
+                                    <a asp-action="DownloadDocument" asp-route-id="@doc.Id" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-download"></i> Download
+                                    </a>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted">No verification documents uploaded.</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions Panel -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">Verification Actions</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.VerificationStatus == "Pending")
+                    {
+                        <p class="text-muted mb-3">This NGO is awaiting verification. Review the information and documents, then approve or reject.</p>
+
+                        <form asp-action="ApproveNGO" asp-route-id="@Model.Id" method="post" class="mb-2">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-success w-100" onclick="return confirm('Are you sure you want to APPROVE this NGO?');">
+                                <i class="bi bi-check-circle"></i> Approve NGO
+                            </button>
+                        </form>
+
+                        <form asp-action="RejectNGO" asp-route-id="@Model.Id" method="post">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-danger w-100" onclick="return confirm('Are you sure you want to REJECT this NGO?');">
+                                <i class="bi bi-x-circle"></i> Reject NGO
+                            </button>
+                        </form>
+                    }
+                    else if (Model.VerificationStatus == "Approved")
+                    {
+                        <div class="alert alert-success">
+                            <i class="bi bi-check-circle-fill"></i> This NGO has been <strong>approved</strong>.
+                        </div>
+
+                        <p class="text-muted mb-3">You can still change the status if needed.</p>
+
+                        <form asp-action="RejectNGO" asp-route-id="@Model.Id" method="post">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-danger w-100" onclick="return confirm('Are you sure you want to REJECT this approved NGO?');">
+                                <i class="bi bi-x-circle"></i> Reject NGO
+                            </button>
+                        </form>
+                    }
+                    else if (Model.VerificationStatus == "Rejected")
+                    {
+                        <div class="alert alert-danger">
+                            <i class="bi bi-x-circle-fill"></i> This NGO has been <strong>rejected</strong>.
+                        </div>
+
+                        <p class="text-muted mb-3">You can still approve this NGO if needed.</p>
+
+                        <form asp-action="ApproveNGO" asp-route-id="@Model.Id" method="post">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-success w-100" onclick="return confirm('Are you sure you want to APPROVE this rejected NGO?');">
+                                <i class="bi bi-check-circle"></i> Approve NGO
+                            </button>
+                        </form>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

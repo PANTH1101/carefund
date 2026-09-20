@@ -1,0 +1,106 @@
+@model IEnumerable<NGODonationSystem.Models.NGO>
+@{
+    ViewData["Title"] = "NGO Verification Management";
+    var currentFilter = ViewBag.CurrentFilter as string ?? "All";
+}
+
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h2>NGO Verification Management</h2>
+            <p class="text-muted">Review and manage NGO registrations</p>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Filter Tabs -->
+    <ul class="nav nav-tabs mb-4">
+        <li class="nav-item">
+            <a class="nav-link @(currentFilter == "All" ? "active" : "")" asp-action="NGOs" asp-route-status="All">
+                All NGOs (@Model.Count())
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @(currentFilter == "Pending" ? "active" : "")" asp-action="NGOs" asp-route-status="Pending">
+                Pending (@Model.Count(n => n.VerificationStatus == "Pending"))
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @(currentFilter == "Approved" ? "active" : "")" asp-action="NGOs" asp-route-status="Approved">
+                Approved (@Model.Count(n => n.VerificationStatus == "Approved"))
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @(currentFilter == "Rejected" ? "active" : "")" asp-action="NGOs" asp-route-status="Rejected">
+                Rejected (@Model.Count(n => n.VerificationStatus == "Rejected"))
+            </a>
+        </li>
+    </ul>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i> No NGOs found with status: <strong>@currentFilter</strong>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>NGO Name</th>
+                        <th>Contact Email</th>
+                        <th>Contact Information</th>
+                        <th>Status</th>
+                        <th>Documents</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var ngo in Model)
+                    {
+                        <tr>
+                            <td>
+                                <strong>@ngo.Name</strong>
+                            </td>
+                            <td>@ngo.User.Email</td>
+                            <td>
+                                <small class="text-muted">@(ngo.ContactInformation.Length > 50 ? ngo.ContactInformation.Substring(0, 50) + "..." : ngo.ContactInformation)</small>
+                            </td>
+                            <td>
+                                @if (ngo.VerificationStatus == "Approved")
+                                {
+                                    <span class="badge bg-success">Approved</span>
+                                }
+                                else if (ngo.VerificationStatus == "Rejected")
+                                {
+                                    <span class="badge bg-danger">Rejected</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning text-dark">Pending</span>
+                                }
+                            </td>
+                            <td>
+                                <span class="badge bg-secondary">@ngo.Documents.Count</span>
+                            </td>
+                            <td>
+                                <a asp-action="NGODetails" asp-route-id="@ngo.Id" class="btn btn-sm btn-primary">
+                                    <i class="bi bi-eye"></i> View Details
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

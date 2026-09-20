@@ -1,0 +1,81 @@
+@model NGODonationSystem.ViewModels.EditProfileViewModel
+@{
+    ViewData["Title"] = "Edit Profile";
+}
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Edit Profile</h3>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit" method="post" enctype="multipart/form-data">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <input type="hidden" asp-for="IsNGO" />
+
+                        <h5 class="mb-3 text-primary">Account Information</h5>
+
+                        <div class="mb-3">
+                            <label asp-for="FullName" class="form-label"></label>
+                            <input asp-for="FullName" class="form-control" />
+                            <span asp-validation-for="FullName" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="PhoneNumber" class="form-label"></label>
+                            <input asp-for="PhoneNumber" class="form-control" type="tel" />
+                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                        </div>
+
+                        @if (Model.IsNGO)
+                        {
+                            <hr class="my-4" />
+                            <h5 class="mb-3 text-success">NGO Information</h5>
+
+                            <div class="mb-3">
+                                <label asp-for="NGOName" class="form-label"></label>
+                                <input asp-for="NGOName" class="form-control" />
+                                <span asp-validation-for="NGOName" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Description" class="form-label"></label>
+                                <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                                <span asp-validation-for="Description" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="ContactInformation" class="form-label"></label>
+                                <textarea asp-for="ContactInformation" class="form-control" rows="3"></textarea>
+                                <span asp-validation-for="ContactInformation" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Logo" class="form-label"></label>
+                                <input asp-for="Logo" class="form-control" type="file" accept="image/*" />
+                                <span asp-validation-for="Logo" class="text-danger"></span>
+                                <small class="form-text text-muted">Upload new logo to replace existing one (Max 5MB, jpg/png/gif)</small>
+                            </div>
+                        }
+
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save"></i> Save Changes
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
