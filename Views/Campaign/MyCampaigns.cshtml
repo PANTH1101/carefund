@@ -1,0 +1,64 @@
+@model IEnumerable<NGODonationSystem.Models.Campaign>
+@{
+    ViewData["Title"] = "My Campaigns";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>My Campaigns</h2>
+        <a asp-action="Create" class="btn btn-primary">Create New Campaign</a>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">
+            You haven't created any campaigns yet. <a asp-action="Create">Create your first campaign</a> to start fundraising.
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var campaign in Model)
+            {
+                var now = DateTime.Now;
+                var raisedAmount = campaign.Donations?.Where(d => d.Status == "Success" || d.Status == "Completed").Sum(d => d.Amount) ?? 0;
+                var isCompleted = raisedAmount >= campaign.TargetAmount;
+                var isExpired = now > campaign.Deadline;
+                var isActive = now >= campaign.StartDate && now <= campaign.Deadline;
+                var progressPercentage = campaign.TargetAmount > 0 ? (int)((raisedAmount / campaign.TargetAmount) * 100) : 0;
+                
+                string statusBadge = isCompleted ? "Completed" : (isExpired ? "Expired" : (isActive ? "Active" : "Upcoming"));
+                string statusClass = isCompleted ? "bg-success" : (isExpired ? "bg-secondary" : (isActive ? "bg-primary" : "bg-info"));
+
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100">
+                        @if (campaign.Image != null && campaign.Image.Length > 0)
+                        {
+                            var base64 = Convert.ToBase64String(campaign.Image);
+                            var imgSrc = $"data:{campaign.ImageContentType};base64,{base64}";
+                            <img src="@imgSrc" class="card-img-top" alt="@campaign.Title" style="height: 200px; object-fit: cover;">
+                        }
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <h5 class="card-title">@campaign.Title</h5>
+                                <span class="badge @statusClass">@statusBadge</span>
+                            </div>
+                            <p class="card-text">@campaign.Category</p>
+                            <div class="progress mb-2">
+                                <div class="progress-bar" style="width: @Math.Min(progressPercentage, 100)%"></div>
+                            </div>
+                            <p class="small">₹@raisedAmount.ToString("N0") of ₹@campaign.TargetAmount.ToString("N0")</p>
+                            <div class="btn-group w-100">
+                                <a asp-action="Details" asp-route-id="@campaign.Id" class="btn btn-sm btn-outline-primary">View</a>
+                                @if (!isExpired && !isCompleted)
+                                {
+                                    <a asp-action="Edit" asp-route-id="@campaign.Id" class="btn btn-sm btn-outline-secondary">Edit</a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
