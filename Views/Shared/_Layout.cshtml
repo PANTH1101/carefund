@@ -57,6 +57,14 @@
                                 </a>
                             </li>
                         }
+                        @if (User.IsInRole("Donor"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Donation" asp-action="MyDonations">
+                                    <i class="bi bi-heart-fill"></i> My Donations
+                                </a>
+                            </li>
+                        }
                     </ul>
                     <ul class="navbar-nav">
                         @if (User.Identity?.IsAuthenticated == true)

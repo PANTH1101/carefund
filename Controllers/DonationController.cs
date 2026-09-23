@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using NGODonationSystem.Data;
 using NGODonationSystem.Models;
 using NGODonationSystem.ViewModels;
+using NGODonationSystem.Helpers;
 using Razorpay.Api;
 using System.Security.Cryptography;
 using System.Text;
@@ -327,6 +328,48 @@ namespace NGODonationSystem.Controllers
                 _context.Payments.Add(payment);
                 await _context.SaveChangesAsync();
 
+                // Generate PDF receipt and send email (failures should not affect donation success)
+                try
+                {
+                    // Reload donation with all necessary relationships for PDF
+                    var donationForReceipt = await _context.Donations
+                        .Include(d => d.Donor)
+                        .Include(d => d.NGO)
+                        .Include(d => d.Campaign)
+                        .Include(d => d.Payment)
+                        .FirstOrDefaultAsync(d => d.Id == donation.Id);
+
+                    if (donationForReceipt != null)
+                    {
+                        // Generate PDF
+                        byte[] pdfBytes = ReceiptPdfGenerator.GenerateReceipt(donationForReceipt);
+
+                        // Send email (failure should not affect donation)
+                        var emailHelper = new EmailHelper(_configuration);
+                        bool emailSent = await emailHelper.SendDonationReceiptAsync(
+                            donationForReceipt.Donor.Email ?? "",
+                            donationForReceipt.Donor.FullName,
+                            donationForReceipt.ReceiptNumber,
+                            donationForReceipt.Campaign.Title,
+                            donationForReceipt.Amount,
+                            donationForReceipt.DonationDate,
+                            donationForReceipt.Id,
+                            donationForReceipt.TransactionId ?? "",
+                            pdfBytes
+                        );
+
+                        if (emailSent)
+                        {
+                            TempData["EmailSent"] = "Receipt sent to your email.";
+                        }
+                    }
+                }
+                catch
+                {
+                    // PDF/Email failure should not affect successful donation
+                    // User can still download receipt manually
+                }
+
                 TempData["SuccessMessage"] = $"Thank you for your donation of ₹{model.Amount:N2}! Your receipt number is {receiptNumber}.";
                 return RedirectToAction("Success", new { id = donation.Id });
             }
@@ -347,6 +390,107 @@ namespace NGODonationSystem.Controllers
                 .FirstOrDefaultAsync(d => d.Id == id && d.DonorId == _userManager.GetUserId(User));
 
             if (donation == null)
+            {
+                return NotFound();
+            }
+
+            return View(donation);
+        }
+
+        // GET: Donation/DownloadReceipt/5
+        [Authorize(Roles = "Donor")]
+        public async Task<IActionResult> DownloadReceipt(int id)
+        {
+            // Get current user
+            var userId = _userManager.GetUserId(User);
+
+            // Get donation with all necessary relationships
+            var donation = await _context.Donations
+                .Include(d => d.Donor)
+                .Include(d => d.NGO)
+                .Include(d => d.Campaign)
+                .Include(d => d.Payment)
+                .FirstOrDefaultAsync(d => d.Id == id);
+
+            // Verify donation exists
+            if (donation == null)
+            {
+                return NotFound();
+            }
+
+            // Verify donation belongs to logged-in donor (security check)
+            if (donation.DonorId != userId)
+            {
+                return NotFound();
+            }
+
+            // Verify donation is successful
+            if (donation.Status != "Success")
+            {
+                TempData["ErrorMessage"] = "Receipt is only available for successful donations.";
+                return RedirectToAction("Success", new { id = donation.Id });
+            }
+
+            try
+            {
+                // Generate PDF
+                byte[] pdfBytes = ReceiptPdfGenerator.GenerateReceipt(donation);
+
+                // Return PDF file for download
+                string fileName = $"CareFund-Receipt-{donation.ReceiptNumber}.pdf";
+                return File(pdfBytes, "application/pdf", fileName);
+            }
+            catch
+            {
+                TempData["ErrorMessage"] = "Failed to generate receipt. Please try again later.";
+                return RedirectToAction("Success", new { id = donation.Id });
+            }
+        }
+
+        // ========================================
+        // DONOR MY DONATIONS
+        // ========================================
+
+        // GET: Donation/MyDonations
+        [Authorize(Roles = "Donor")]
+        public async Task<IActionResult> MyDonations()
+        {
+            // Get current user ID
+            var userId = _userManager.GetUserId(User);
+
+            // Get all donations by this donor
+            var donations = await _context.Donations
+                .Include(d => d.Campaign)
+                .Include(d => d.NGO)
+                .Where(d => d.DonorId == userId)
+                .OrderByDescending(d => d.DonationDate)
+                .ToListAsync();
+
+            return View(donations);
+        }
+
+        // GET: Donation/DonorDetails/5
+        [Authorize(Roles = "Donor")]
+        public async Task<IActionResult> DonorDetails(int id)
+        {
+            // Get current user ID
+            var userId = _userManager.GetUserId(User);
+
+            // Get donation with all necessary relationships
+            var donation = await _context.Donations
+                .Include(d => d.Campaign)
+                .Include(d => d.NGO)
+                .Include(d => d.Payment)
+                .FirstOrDefaultAsync(d => d.Id == id);
+
+            // Verify donation exists
+            if (donation == null)
+            {
+                return NotFound();
+            }
+
+            // Verify donation belongs to logged-in donor (security check)
+            if (donation.DonorId != userId)
             {
                 return NotFound();
             }

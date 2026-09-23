@@ -1,0 +1,91 @@
+@model List<NGODonationSystem.Models.Donation>
+@{
+    ViewData["Title"] = "My Donations";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="bi bi-heart-fill text-danger"></i> My Donations</h2>
+            </div>
+
+            @if (Model.Any())
+            {
+                <div class="card shadow">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Donation History</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Campaign</th>
+                                        <th>NGO</th>
+                                        <th>Amount</th>
+                                        <th>Date</th>
+                                        <th>Status</th>
+                                        <th>Receipt #</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var donation in Model)
+                                    {
+                                        <tr>
+                                            <td>@donation.Campaign.Title</td>
+                                            <td>@donation.NGO.Name</td>
+                                            <td class="fw-bold text-success">Rs.@donation.Amount.ToString("N2")</td>
+                                            <td>@donation.DonationDate.ToString("dd MMM yyyy")</td>
+                                            <td>
+                                                @if (donation.Status == "Success")
+                                                {
+                                                    <span class="badge bg-success">
+                                                        <i class="bi bi-check-circle"></i> @donation.Status
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary">@donation.Status</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <small class="text-muted font-monospace">@donation.ReceiptNumber</small>
+                                            </td>
+                                            <td>
+                                                <div class="btn-group" role="group">
+                                                    <a asp-action="DonorDetails" asp-route-id="@donation.Id" 
+                                                       class="btn btn-sm btn-outline-primary" title="View Details">
+                                                        <i class="bi bi-eye"></i>
+                                                    </a>
+                                                    @if (donation.Status == "Success")
+                                                    {
+                                                        <a asp-action="DownloadReceipt" asp-route-id="@donation.Id" 
+                                                           class="btn btn-sm btn-outline-success" title="Download Receipt">
+                                                            <i class="bi bi-download"></i>
+                                                        </a>
+                                                    }
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card-footer text-muted">
+                        <small>Total Donations: <strong>@Model.Count</strong></small>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i> You haven't made any donations yet. 
+                    <a asp-controller="Campaign" asp-action="Index" class="alert-link">Browse campaigns</a> to get started.
+                </div>
+            }
+        </div>
+    </div>
+</div>
