@@ -26,6 +26,8 @@ namespace NGODonationSystem.Models
 
         public string ReceiptNumber { get; set; } = string.Empty;
 
+        public bool IsAnonymous { get; set; }
+
         public Payment? Payment { get; set; }
     }
 }

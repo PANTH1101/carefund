@@ -1,0 +1,68 @@
+@model NGODonationSystem.ViewModels.DonationReviewViewModel
+@{
+    ViewData["Title"] = "Review Donation";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-info text-white">
+                    <h3 class="mb-0">Review Your Donation</h3>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h5 class="text-muted">Campaign</h5>
+                        <p class="h6 mb-0">@Model.CampaignTitle</p>
+                    </div>
+
+                    <div class="mb-4">
+                        <h5 class="text-muted">NGO</h5>
+                        <p class="h6 mb-0">@Model.NGOName</p>
+                    </div>
+
+                    <div class="mb-4">
+                        <h5 class="text-muted">Your Information</h5>
+                        <p class="mb-1"><strong>Name:</strong> @Model.DonorName</p>
+                        <p class="mb-0"><strong>Email:</strong> @Model.DonorEmail</p>
+                        @if (Model.IsAnonymous)
+                        {
+                            <p class="mb-0 mt-2"><span class="badge bg-secondary"><i class="bi bi-eye-slash"></i> Anonymous Donation</span></p>
+                            <small class="text-muted">Your name will not be shown to the NGO</small>
+                        }
+                    </div>
+
+                    <div class="mb-4">
+                        <h5 class="text-muted">Donation Amount</h5>
+                        <p class="h3 text-primary mb-0">₹@Model.Amount.ToString("N2")</p>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <i class="bi bi-info-circle"></i> You will be redirected to Razorpay for secure payment processing.
+                    </div>
+
+                    <form asp-action="ProcessPayment" method="post">
+                        <input type="hidden" name="CampaignId" value="@Model.CampaignId" />
+                        <input type="hidden" name="CampaignTitle" value="@Model.CampaignTitle" />
+                        <input type="hidden" name="NGOName" value="@Model.NGOName" />
+                        <input type="hidden" name="DonorName" value="@Model.DonorName" />
+                        <input type="hidden" name="DonorEmail" value="@Model.DonorEmail" />
+                        <input type="hidden" name="Amount" value="@Model.Amount" />
+                        <input type="hidden" name="IsAnonymous" value="@Model.IsAnonymous" />
+
+                        @Html.AntiForgeryToken()
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="bi bi-credit-card"></i> Proceed to Payment
+                            </button>
+                            <a asp-action="Create" asp-route-campaignId="@Model.CampaignId" class="btn btn-secondary">
+                                Go Back
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

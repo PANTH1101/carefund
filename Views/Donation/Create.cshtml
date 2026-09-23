@@ -1,0 +1,99 @@
+@model NGODonationSystem.ViewModels.DonationViewModel
+@{
+    ViewData["Title"] = "Make a Donation";
+    var campaign = ViewBag.Campaign as NGODonationSystem.Models.Campaign;
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Make a Donation</h3>
+                </div>
+                <div class="card-body">
+                    @if (campaign != null)
+                    {
+                        <div class="alert alert-info">
+                            <h5><i class="bi bi-megaphone"></i> @campaign.Title</h5>
+                            <p class="mb-0">by <strong>@campaign.NGO.Name</strong></p>
+                        </div>
+                    }
+
+                    <form action="/Donation/Create" method="post">
+                        <input type="hidden" name="CampaignId" value="@Model.CampaignId" />
+                        @Html.AntiForgeryToken()
+                        @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Select Donation Amount</label>
+                            <div class="row g-3">
+                                <div class="col-6 col-md-3">
+                                    <button type="button" class="btn btn-outline-primary w-100 amount-btn" data-amount="100">Rs.100</button>
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <button type="button" class="btn btn-outline-primary w-100 amount-btn" data-amount="500">Rs.500</button>
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <button type="button" class="btn btn-outline-primary w-100 amount-btn" data-amount="1000">Rs.1000</button>
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <button type="button" class="btn btn-outline-primary w-100 amount-btn" data-amount="5000">Rs.5000</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="Amount" class="form-label fw-bold">Donation Amount (Rs.)</label>
+                            <div class="input-group">
+                                <span class="input-group-text">Rs.</span>
+                                <input type="number" id="customAmount" name="Amount" class="form-control" placeholder="Enter custom amount" min="1" step="0.01" value="@Model.Amount" />
+                            </div>
+                            @Html.ValidationMessageFor(m => m.Amount, "", new { @class = "text-danger" })
+                            <small class="form-text text-muted">Minimum amount: Rs.1</small>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input type="checkbox" id="IsAnonymous" name="IsAnonymous" class="form-check-input" value="true" @(Model.IsAnonymous ? "checked" : "") />
+                                <label class="form-check-label" for="IsAnonymous">Make this donation anonymous</label>
+                            </div>
+                            <small class="form-text text-muted">Your name will not be shown to the NGO</small>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-arrow-right-circle"></i> Review Donation
+                            </button>
+                            <a href="/Campaign/Details/@Model.CampaignId" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const amountButtons = document.querySelectorAll('.amount-btn');
+            const customAmountInput = document.getElementById('customAmount');
+
+            amountButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const amount = this.getAttribute('data-amount');
+                    customAmountInput.value = amount;
+                    
+                    amountButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+
+            customAmountInput.addEventListener('input', function() {
+                amountButtons.forEach(btn => btn.classList.remove('active'));
+            });
+        });
+    </script>
+}

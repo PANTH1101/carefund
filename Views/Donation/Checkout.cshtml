@@ -1,0 +1,84 @@
+@{
+    ViewData["Title"] = "Payment Checkout";
+    var keyId = ViewBag.RazorpayKeyId as string;
+    var orderId = ViewBag.OrderId as string;
+    var amount = ViewBag.Amount as int?;
+    var currency = ViewBag.Currency as string;
+    var donorName = ViewBag.DonorName as string;
+    var donorEmail = ViewBag.DonorEmail as string;
+    var campaignId = ViewBag.CampaignId as int?;
+    var campaignTitle = ViewBag.CampaignTitle as string;
+    var donationAmount = ViewBag.DonationAmount as decimal?;
+    var isAnonymous = ViewBag.IsAnonymous as bool? ?? false;
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-body text-center">
+                    <div class="spinner-border text-primary mb-3" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <h4>Opening Payment Gateway...</h4>
+                    <p class="text-muted">Please wait while we redirect you to Razorpay</p>
+                    <p>Amount: <strong>₹@donationAmount?.ToString("N2")</strong></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<form id="paymentForm" asp-action="VerifyPayment" method="post">
+    <input type="hidden" name="RazorpayOrderId" id="razorpay_order_id" />
+    <input type="hidden" name="RazorpayPaymentId" id="razorpay_payment_id" />
+    <input type="hidden" name="RazorpaySignature" id="razorpay_signature" />
+    <input type="hidden" name="CampaignId" value="@campaignId" />
+    <input type="hidden" name="Amount" value="@donationAmount" />
+    <input type="hidden" name="IsAnonymous" value="@isAnonymous" />
+    @Html.AntiForgeryToken()
+</form>
+
+@section Scripts {
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+        var options = {
+            "key": "@keyId",
+            "amount": @amount,
+            "currency": "@currency",
+            "name": "CareFund",
+            "description": "@campaignTitle",
+            "order_id": "@orderId",
+            "prefill": {
+                "name": "@donorName",
+                "email": "@donorEmail"
+            },
+            "theme": {
+                "color": "#0d6efd"
+            },
+            "handler": function (response) {
+                document.getElementById('razorpay_order_id').value = response.razorpay_order_id;
+                document.getElementById('razorpay_payment_id').value = response.razorpay_payment_id;
+                document.getElementById('razorpay_signature').value = response.razorpay_signature;
+                document.getElementById('paymentForm').submit();
+            },
+            "modal": {
+                "ondismiss": function() {
+                    window.location.href = '/Campaign/Details/@campaignId';
+                }
+            }
+        };
+
+        var rzp = new Razorpay(options);
+        
+        // Open checkout automatically
+        window.onload = function() {
+            rzp.open();
+        };
+
+        rzp.on('payment.failed', function (response) {
+            alert('Payment failed. Please try again.');
+            window.location.href = '/Campaign/Details/@campaignId';
+        });
+    </script>
+}

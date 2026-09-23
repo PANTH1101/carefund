@@ -1,0 +1,64 @@
+@model NGODonationSystem.Models.Donation
+@{
+    ViewData["Title"] = "Donation Successful";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow border-success">
+                <div class="card-header bg-success text-white text-center">
+                    <h2 class="mb-0"><i class="bi bi-check-circle-fill"></i> Thank You!</h2>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-success">
+                        <h4 class="alert-heading">Your donation was successful!</h4>
+                        <p class="mb-0">Thank you for supporting <strong>@Model.Campaign.Title</strong></p>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5 class="text-muted">Donation Details</h5>
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td><strong>Amount:</strong></td>
+                                    <td class="text-end">₹@Model.Amount.ToString("N2")</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Date:</strong></td>
+                                    <td class="text-end">@Model.DonationDate.ToString("MMM dd, yyyy HH:mm")</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Receipt Number:</strong></td>
+                                    <td class="text-end"><span class="badge bg-primary">@Model.ReceiptNumber</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Transaction ID:</strong></td>
+                                    <td class="text-end"><small class="text-muted">@Model.TransactionId</small></td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="text-muted">Campaign</h5>
+                            <p><strong>@Model.Campaign.Title</strong></p>
+                            <p class="text-muted mb-0">by @Model.NGO.Name</p>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> Your receipt number is <strong>@Model.ReceiptNumber</strong>. Please save this for your records.
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <a asp-controller="Campaign" asp-action="Details" asp-route-id="@Model.CampaignId" class="btn btn-primary">
+                            <i class="bi bi-arrow-left"></i> Back to Campaign
+                        </a>
+                        <a asp-controller="Campaign" asp-action="Index" class="btn btn-outline-secondary">
+                            Browse More Campaigns
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
