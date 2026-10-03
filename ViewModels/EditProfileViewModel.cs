@@ -30,6 +30,21 @@ namespace NGODonationSystem.ViewModels
         [Display(Name = "New Logo")]
         public IFormFile? Logo { get; set; }
 
+        // Verification resubmission (for rejected NGOs)
+        [Display(Name = "Verification Documents")]
+        public List<IFormFile>? VerificationDocuments { get; set; }
+
+        public string? VerificationStatus { get; set; }
+
+        public List<NGODocumentInfo>? ExistingDocuments { get; set; }
+
         public bool IsNGO { get; set; }
+    }
+
+    public class NGODocumentInfo
+    {
+        public int Id { get; set; }
+        public string FileName { get; set; } = string.Empty;
+        public string ContentType { get; set; } = string.Empty;
     }
 }
