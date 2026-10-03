@@ -27,6 +27,104 @@
                             <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                         </div>
 
+                        @if (Model.IsNGO)
+                        {
+                            <hr class="my-4" />
+                            <h5 class="mb-3 text-primary">NGO Information</h5>
+                            
+                            <div class="mb-3">
+                                <label asp-for="NGOName" class="form-label"></label>
+                                <input asp-for="NGOName" class="form-control" />
+                                <span asp-validation-for="NGOName" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Description" class="form-label"></label>
+                                <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                                <span asp-validation-for="Description" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="ContactInformation" class="form-label"></label>
+                                <textarea asp-for="ContactInformation" class="form-control" rows="3"></textarea>
+                                <span asp-validation-for="ContactInformation" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Logo" class="form-label"></label>
+                                <input asp-for="Logo" class="form-control" type="file" accept="image/*" />
+                                <span asp-validation-for="Logo" class="text-danger"></span>
+                                <small class="form-text text-muted">Accepted formats: JPG, JPEG, PNG, GIF. Max size: 5MB</small>
+                            </div>
+
+                            @if (!string.IsNullOrEmpty(Model.VerificationStatus))
+                            {
+                                <hr class="my-4" />
+                                <h5 class="mb-3 text-primary">Verification Status</h5>
+                                <div class="mb-3">
+                                    @if (Model.VerificationStatus == "Pending")
+                                    {
+                                        <span class="badge bg-warning text-dark fs-6">
+                                            <i class="bi bi-clock"></i> Pending Review
+                                        </span>
+                                    }
+                                    else if (Model.VerificationStatus == "Approved")
+                                    {
+                                        <span class="badge bg-success fs-6">
+                                            <i class="bi bi-check-circle"></i> Approved
+                                        </span>
+                                    }
+                                    else if (Model.VerificationStatus == "Rejected")
+                                    {
+                                        <span class="badge bg-danger fs-6">
+                                            <i class="bi bi-x-circle"></i> Rejected
+                                        </span>
+                                    }
+                                </div>
+                            }
+
+                            @if (Model.VerificationStatus == "Rejected")
+                            {
+                                <hr class="my-4" />
+                                <div class="alert alert-warning">
+                                    <h5 class="alert-heading"><i class="bi bi-exclamation-triangle"></i> Verification Resubmission</h5>
+                                    <p class="mb-0">Your NGO verification was rejected. Please update your information above and upload corrected/new verification documents below, then save to resubmit for verification.</p>
+                                </div>
+
+                                @if (Model.ExistingDocuments != null && Model.ExistingDocuments.Any())
+                                {
+                                    <div class="mb-3">
+                                        <h6 class="text-muted">Current Verification Documents:</h6>
+                                        <ul class="list-group">
+                                            @foreach (var doc in Model.ExistingDocuments)
+                                            {
+                                                <li class="list-group-item">
+                                                    <i class="bi bi-file-earmark-text"></i> @doc.FileName
+                                                    <small class="text-muted">(@doc.ContentType)</small>
+                                                </li>
+                                            }
+                                        </ul>
+                                    </div>
+                                }
+
+                                <div class="mb-3">
+                                    <label asp-for="VerificationDocuments" class="form-label fw-bold"></label>
+                                    <input asp-for="VerificationDocuments" class="form-control" type="file" multiple 
+                                           accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" />
+                                    <span asp-validation-for="VerificationDocuments" class="text-danger"></span>
+                                    <small class="form-text text-muted">
+                                        Upload corrected or new verification documents. 
+                                        Accepted formats: PDF, DOC, DOCX, JPG, JPEG, PNG. Max size per file: 10MB.
+                                        You can select multiple files.
+                                    </small>
+                                </div>
+
+                                <div class="alert alert-info">
+                                    <i class="bi bi-info-circle"></i> After uploading new documents and saving, your verification status will change to <strong>Pending</strong> and will be reviewed by an administrator.
+                                </div>
+                            }
+                        }
+
                         <div class="mt-4">
                             <button type="submit" class="btn btn-primary">Save Changes</button>
                             <a asp-action="Index" class="btn btn-secondary">Cancel</a>
