@@ -76,6 +76,18 @@
                             </div>
                         </div>
 
+                        @if (ngo.VerificationStatus == "Rejected")
+                        {
+                            <div class="alert alert-warning mt-3">
+                                <h6 class="alert-heading"><i class="bi bi-exclamation-triangle"></i> Verification Rejected</h6>
+                                <p class="mb-0">
+                                    Your NGO verification was rejected. You can 
+                                    <a asp-action="Edit" class="alert-link">edit your profile</a> 
+                                    to update your information and upload corrected verification documents for resubmission.
+                                </p>
+                            </div>
+                        }
+
                         @if (ngo.Logo != null)
                         {
                             <div class="row mb-3">
