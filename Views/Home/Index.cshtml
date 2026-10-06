@@ -1,442 +1,244 @@
 ﻿@{
-    ViewData["Title"] = "CareFund - Empowering Change Through Verified NGOs";
+    ViewData["Title"] = "CareFund - Support Verified NGOs";
 }
 
 <style>
-    /* Modern Color Palette & Variables */
-    :root {
-        --primary-blue: #3b82f6;
-        --primary-dark: #1e40af;
-        --accent-teal: #14b8a6;
-        --accent-purple: #8b5cf6;
-        --neutral-900: #0f172a;
-        --neutral-700: #334155;
-        --neutral-500: #64748b;
-        --neutral-100: #f1f5f9;
-        --neutral-50: #f8fafc;
-    }
-
-    /* Hero Section - Bold & Modern */
+    /* Hero Section - Refined and Balanced */
     .hero-section {
-        position: relative;
-        padding: 5rem 0 6rem;
-        background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
-        overflow: hidden;
+        padding: 3rem 0 4rem;
+        background: #ffffff;
+        border-bottom: 1px solid #e9ecef;
     }
-
-    .hero-section::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-        opacity: 0.4;
-    }
-
-    .hero-content {
-        position: relative;
-        z-index: 1;
-        max-width: 800px;
-        margin: 0 auto;
-        text-align: center;
-        color: #ffffff;
-    }
-
-    .hero-badge {
-        display: inline-block;
-        background: rgba(255, 255, 255, 0.2);
-        backdrop-filter: blur(10px);
-        padding: 0.5rem 1.25rem;
-        border-radius: 50px;
-        font-size: 0.8125rem;
+    
+    .hero-eyebrow {
+        font-size: 0.75rem;
         font-weight: 600;
-        letter-spacing: 0.5px;
+        letter-spacing: 1.5px;
+        color: #3b82f6;
         text-transform: uppercase;
-        margin-bottom: 1.5rem;
-        border: 1px solid rgba(255, 255, 255, 0.3);
+        margin-bottom: 1rem;
     }
-
+    
     .hero-title {
-        font-size: 3.5rem;
-        font-weight: 800;
-        line-height: 1.1;
-        margin-bottom: 1.5rem;
-        text-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        font-size: 2.75rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 1rem;
+        line-height: 1.2;
     }
-
-    .hero-description {
-        font-size: 1.25rem;
-        line-height: 1.7;
-        margin-bottom: 2.5rem;
-        opacity: 0.95;
-        font-weight: 400;
+    
+    .hero-subtitle {
+        font-size: 1.125rem;
+        color: #6c757d;
+        margin-bottom: 2rem;
+        line-height: 1.6;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
     }
-
-    .hero-actions {
+    
+    .hero-buttons {
         display: flex;
         gap: 1rem;
         justify-content: center;
         flex-wrap: wrap;
     }
-
-    .hero-actions .btn {
-        padding: 1rem 2rem;
-        font-size: 1.0625rem;
-        font-weight: 600;
-        border-radius: 8px;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    }
-
-    .hero-actions .btn-light {
-        background: #ffffff;
-        color: var(--primary-blue);
-        border: none;
-    }
-
-    .hero-actions .btn-light:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-    }
-
-    .hero-actions .btn-outline-light {
-        background: transparent;
-        color: #ffffff;
-        border: 2px solid rgba(255, 255, 255, 0.8);
-    }
-
-    .hero-actions .btn-outline-light:hover {
-        background: rgba(255, 255, 255, 0.15);
-        border-color: #ffffff;
-        transform: translateY(-2px);
-    }
-
-    /* Features Section - Card-Based */
-    .features-section {
-        padding: 5rem 0;
-        background: var(--neutral-50);
-    }
-
-    .features-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-        gap: 2rem;
-        max-width: 1200px;
-        margin: 0 auto;
-    }
-
-    .feature-card {
-        background: #ffffff;
-        border-radius: 16px;
-        padding: 2.5rem;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-        transition: all 0.3s ease;
-        border: 1px solid rgba(0, 0, 0, 0.05);
-    }
-
-    .feature-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 12px 24px rgba(59, 130, 246, 0.12);
-        border-color: var(--primary-blue);
-    }
-
-    .feature-icon-wrapper {
-        width: 64px;
-        height: 64px;
-        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--accent-teal) 100%);
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 1.5rem;
-        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
-    }
-
-    .feature-icon-wrapper i {
-        font-size: 1.75rem;
-        color: #ffffff;
-    }
-
-    .feature-title {
-        font-size: 1.375rem;
-        font-weight: 700;
-        color: var(--neutral-900);
-        margin-bottom: 0.75rem;
-    }
-
-    .feature-description {
+    
+    .hero-buttons .btn {
+        padding: 0.75rem 1.75rem;
         font-size: 1rem;
-        color: var(--neutral-500);
-        line-height: 1.7;
+        font-weight: 500;
+        border-radius: 6px;
     }
-
-    /* Process Section - Timeline Style */
-    .process-section {
-        padding: 5rem 0;
-        background: #ffffff;
+    
+    /* Trust/Value Section */
+    .trust-section {
+        padding: 4rem 0;
+        background: #f8f9fa;
     }
-
-    .section-header {
-        text-align: center;
-        max-width: 700px;
-        margin: 0 auto 4rem;
-    }
-
-    .section-label {
-        display: inline-block;
-        font-size: 0.875rem;
-        font-weight: 600;
-        color: var(--primary-blue);
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        margin-bottom: 0.75rem;
-    }
-
-    .section-title {
-        font-size: 2.5rem;
-        font-weight: 800;
-        color: var(--neutral-900);
-        margin-bottom: 1rem;
-        line-height: 1.2;
-    }
-
-    .section-description {
-        font-size: 1.125rem;
-        color: var(--neutral-500);
-        line-height: 1.6;
-    }
-
-    .process-timeline {
+    
+    .trust-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 3rem;
-        max-width: 1200px;
-        margin: 0 auto;
-        position: relative;
-    }
-
-    .process-step {
-        position: relative;
-        text-align: center;
-    }
-
-    .step-number-badge {
-        width: 72px;
-        height: 72px;
-        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--accent-purple) 100%);
-        color: #ffffff;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 2rem;
-        font-weight: 800;
-        margin: 0 auto 1.5rem;
-        box-shadow: 0 8px 24px rgba(59, 130, 246, 0.3);
-        position: relative;
-    }
-
-    .step-number-badge::after {
-        content: '';
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        border: 2px solid var(--primary-blue);
-        border-radius: 50%;
-        top: -6px;
-        left: -6px;
-        opacity: 0.3;
-    }
-
-    .step-heading {
-        font-size: 1.25rem;
-        font-weight: 700;
-        color: var(--neutral-900);
-        margin-bottom: 0.75rem;
-    }
-
-    .step-text {
-        font-size: 1rem;
-        color: var(--neutral-500);
-        line-height: 1.7;
-    }
-
-    /* Stats Section */
-    .stats-section {
-        padding: 4rem 0;
-        background: linear-gradient(135deg, var(--neutral-900) 0%, var(--neutral-700) 100%);
-        color: #ffffff;
-    }
-
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 3rem;
+        gap: 1.5rem;
         max-width: 1000px;
         margin: 0 auto;
+    }
+    
+    .trust-card {
+        background: #ffffff;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 2rem 1.5rem;
         text-align: center;
+        transition: box-shadow 0.2s ease, border-color 0.2s ease;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
     }
-
-    .stat-item {
-        padding: 1rem;
+    
+    .trust-card:hover {
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+        border-color: #3b82f6;
     }
-
-    .stat-icon {
+    
+    .trust-icon {
         font-size: 2.5rem;
-        margin-bottom: 1rem;
-        color: var(--accent-teal);
+        color: #3b82f6;
+        margin-bottom: 1.25rem;
     }
-
-    .stat-number {
-        font-size: 2.5rem;
-        font-weight: 800;
-        margin-bottom: 0.5rem;
-        display: block;
+    
+    .trust-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.75rem;
     }
-
-    .stat-label {
+    
+    .trust-description {
         font-size: 0.9375rem;
-        opacity: 0.8;
-        font-weight: 500;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
+        color: #6c757d;
+        line-height: 1.6;
+        flex-grow: 1;
     }
-
-    /* CTA Section - Bold & Action-Oriented */
-    .cta-section {
-        padding: 5rem 0;
-        background: linear-gradient(135deg, #14b8a6 0%, #3b82f6 100%);
-        position: relative;
-        overflow: hidden;
+    
+    /* How CareFund Works Section */
+    .how-it-works-section {
+        padding: 4rem 0;
+        background: #ffffff;
     }
-
-    .cta-section::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M50 50c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10s-10-4.477-10-10 4.477-10 10-10zM10 10c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10S0 25.523 0 20s4.477-10 10-10zm10 8c4.418 0 8-3.582 8-8s-3.582-8-8-8-8 3.582-8 8 3.582 8 8 8zm40 40c4.418 0 8-3.582 8-8s-3.582-8-8-8-8 3.582-8 8 3.582 8 8 8z' /%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-    }
-
-    .cta-content {
-        position: relative;
-        z-index: 1;
-        max-width: 700px;
-        margin: 0 auto;
+    
+    .section-heading {
         text-align: center;
+        margin-bottom: 3rem;
+    }
+    
+    .section-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+    }
+    
+    .section-subtitle {
+        font-size: 1rem;
+        color: #6c757d;
+    }
+    
+    .steps-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 2rem;
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+    
+    .step-card {
+        text-align: center;
+        position: relative;
+    }
+    
+    .step-number {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 56px;
+        height: 56px;
+        background: #3b82f6;
         color: #ffffff;
+        border-radius: 50%;
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 1.25rem;
     }
-
-    .cta-heading {
-        font-size: 2.75rem;
-        font-weight: 800;
-        line-height: 1.2;
-        margin-bottom: 1.5rem;
+    
+    .step-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.75rem;
     }
-
-    .cta-subheading {
-        font-size: 1.25rem;
-        margin-bottom: 2.5rem;
-        opacity: 0.95;
+    
+    .step-description {
+        font-size: 0.9375rem;
+        color: #6c757d;
         line-height: 1.6;
     }
-
-    .cta-actions {
+    
+    /* Final CTA Section */
+    .final-cta-section {
+        padding: 3rem 0;
+        background: #f8f9fa;
+        border-top: 1px solid #e9ecef;
+        text-align: center;
+    }
+    
+    .cta-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 1.5rem;
+    }
+    
+    .cta-buttons {
         display: flex;
         gap: 1rem;
         justify-content: center;
         flex-wrap: wrap;
     }
-
-    .cta-actions .btn {
-        padding: 1rem 2.5rem;
-        font-size: 1.0625rem;
-        font-weight: 600;
-        border-radius: 8px;
-        transition: all 0.3s ease;
+    
+    .cta-buttons .btn {
+        padding: 0.75rem 1.75rem;
+        font-size: 1rem;
+        font-weight: 500;
+        border-radius: 6px;
     }
-
-    .cta-actions .btn-light {
-        background: #ffffff;
-        color: var(--primary-blue);
-        border: none;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    }
-
-    .cta-actions .btn-light:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-    }
-
-    .cta-actions .btn-outline-light {
-        background: transparent;
-        color: #ffffff;
-        border: 2px solid #ffffff;
-    }
-
-    .cta-actions .btn-outline-light:hover {
-        background: rgba(255, 255, 255, 0.15);
-        transform: translateY(-3px);
-    }
-
+    
     /* Responsive Design */
     @@media (max-width: 768px) {
         .hero-section {
-            padding: 3.5rem 0 4rem;
+            padding: 2.5rem 0 3rem;
         }
-
+        
         .hero-title {
-            font-size: 2.25rem;
-        }
-
-        .hero-description {
-            font-size: 1.0625rem;
-        }
-
-        .hero-actions,
-        .cta-actions {
-            flex-direction: column;
-            width: 100%;
-        }
-
-        .hero-actions .btn,
-        .cta-actions .btn {
-            width: 100%;
-        }
-
-        .features-section,
-        .process-section,
-        .cta-section {
-            padding: 3.5rem 0;
-        }
-
-        .section-title,
-        .cta-heading {
             font-size: 2rem;
         }
-
-        .features-grid,
-        .process-timeline {
-            grid-template-columns: 1fr;
-            gap: 1.5rem;
+        
+        .hero-subtitle {
+            font-size: 1rem;
         }
-
-        .stats-grid {
-            grid-template-columns: repeat(2, 1fr);
-            gap: 2rem;
+        
+        .hero-buttons,
+        .cta-buttons {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        
+        .hero-buttons .btn,
+        .cta-buttons .btn {
+            width: 100%;
+        }
+        
+        .trust-section,
+        .how-it-works-section,
+        .final-cta-section {
+            padding: 3rem 0;
+        }
+        
+        .section-title {
+            font-size: 1.75rem;
+        }
+        
+        .trust-grid,
+        .steps-grid {
+            grid-template-columns: 1fr;
+            gap: 1.25rem;
         }
     }
-
+    
     @@media (min-width: 769px) and (max-width: 991px) {
-        .features-grid {
-            grid-template-columns: repeat(2, 1fr);
-        }
-
-        .process-timeline {
+        .trust-grid,
+        .steps-grid {
             grid-template-columns: repeat(2, 1fr);
         }
     }
@@ -444,191 +246,140 @@
 
 <!-- Hero Section -->
 <div class="hero-section">
-    <div class="container">
-        <div class="hero-content">
-            <div class="hero-badge">
-                <i class="bi bi-star-fill"></i> Trusted Platform • Verified NGOs • Real Impact
-            </div>
-            <h1 class="hero-title">Empower Change.<br/>Transform Lives.</h1>
-            <p class="hero-description">
-                Connect directly with verified NGOs across India. Support causes that matter to you with complete transparency, security, and measurable impact.
-            </p>
-            <div class="hero-actions">
-                @if (User.Identity?.IsAuthenticated == true)
+    <div class="container text-center" style="max-width: 750px;">
+        <div class="hero-eyebrow">SUPPORT • DONATE • MAKE AN IMPACT</div>
+        <h1 class="hero-title">Make a Difference With CareFund</h1>
+        <p class="hero-subtitle">
+            Connect with verified NGOs and support causes that matter. Every donation creates real impact with complete transparency and security.
+        </p>
+        <div class="hero-buttons">
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                @if (User.IsInRole("Donor"))
                 {
-                    @if (User.IsInRole("Donor"))
-                    {
-                        <a asp-controller="Campaign" asp-action="Index" class="btn btn-light">
-                            <i class="bi bi-compass"></i> Explore Campaigns
-                        </a>
-                        <a asp-controller="DonorDashboard" asp-action="Index" class="btn btn-outline-light">
-                            <i class="bi bi-speedometer2"></i> My Dashboard
-                        </a>
-                    }
-                    else if (User.IsInRole("NGO"))
-                    {
-                        <a asp-controller="Campaign" asp-action="MyCampaigns" class="btn btn-light">
-                            <i class="bi bi-megaphone"></i> View My Campaigns
-                        </a>
-                        <a asp-controller="Campaign" asp-action="Create" class="btn btn-outline-light">
-                            <i class="bi bi-plus-circle"></i> Create Campaign
-                        </a>
-                    }
-                    else if (User.IsInRole("Admin"))
-                    {
-                        <a asp-controller="Admin" asp-action="Dashboard" class="btn btn-light">
-                            <i class="bi bi-shield-check"></i> Admin Dashboard
-                        </a>
-                    }
-                }
-                else
-                {
-                    <a asp-controller="Campaign" asp-action="Index" class="btn btn-light">
-                        <i class="bi bi-compass"></i> Explore Campaigns
+                    <a asp-controller="Campaign" asp-action="Index" class="btn btn-primary">
+                        <i class="bi bi-search"></i> Explore Campaigns
                     </a>
-                    <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-outline-light">
-                        <i class="bi bi-arrow-right-circle"></i> Get Started Free
+                    <a asp-controller="DonorDashboard" asp-action="Index" class="btn btn-outline-primary">
+                        <i class="bi bi-speedometer2"></i> My Dashboard
                     </a>
                 }
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Features Section -->
-<div class="features-section">
-    <div class="container">
-        <div class="features-grid">
-            <div class="feature-card">
-                <div class="feature-icon-wrapper">
-                    <i class="bi bi-patch-check-fill"></i>
-                </div>
-                <h3 class="feature-title">100% Verified NGOs</h3>
-                <p class="feature-description">
-                    Every organization is rigorously verified by our admin team. Documentation, registration certificates, and credentials are thoroughly checked before approval.
-                </p>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon-wrapper">
-                    <i class="bi bi-graph-up-arrow"></i>
-                </div>
-                <h3 class="feature-title">Real-Time Tracking</h3>
-                <p class="feature-description">
-                    Monitor your donations and campaign progress in real-time. View detailed analytics, download receipts, and track exactly where your contribution goes.
-                </p>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon-wrapper">
-                    <i class="bi bi-shield-lock-fill"></i>
-                </div>
-                <h3 class="feature-title">Bank-Grade Security</h3>
-                <p class="feature-description">
-                    Secure payments powered by Razorpay with military-grade encryption. Your payment information and personal data are always protected.
-                </p>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Process Section -->
-<div class="process-section">
-    <div class="container">
-        <div class="section-header">
-            <div class="section-label">How It Works</div>
-            <h2 class="section-title">Three Steps to Make an Impact</h2>
-            <p class="section-description">
-                Our streamlined donation process makes it easy to support causes you care about. Start making a difference in minutes.
-            </p>
-        </div>
-
-        <div class="process-timeline">
-            <div class="process-step">
-                <div class="step-number-badge">1</div>
-                <h3 class="step-heading">Discover Campaigns</h3>
-                <p class="step-text">
-                    Browse through verified campaigns across categories like education, healthcare, environment, and more. Filter by location, goal amount, or cause to find what matters to you.
-                </p>
-            </div>
-
-            <div class="process-step">
-                <div class="step-number-badge">2</div>
-                <h3 class="step-heading">Donate Securely</h3>
-                <p class="step-text">
-                    Choose your contribution amount and complete payment through our secure gateway. Receive instant confirmation, digital receipt, and email notification immediately.
-                </p>
-            </div>
-
-            <div class="process-step">
-                <div class="step-number-badge">3</div>
-                <h3 class="step-heading">Track Your Impact</h3>
-                <p class="step-text">
-                    Access your personalized dashboard to monitor campaign progress, view complete donation history, and download tax-deductible receipts anytime you need them.
-                </p>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Stats Section -->
-<div class="stats-section">
-    <div class="container">
-        <div class="stats-grid">
-            <div class="stat-item">
-                <div class="stat-icon">
-                    <i class="bi bi-building"></i>
-                </div>
-                <span class="stat-number">500+</span>
-                <div class="stat-label">Verified NGOs</div>
-            </div>
-
-            <div class="stat-item">
-                <div class="stat-icon">
-                    <i class="bi bi-heart-fill"></i>
-                </div>
-                <span class="stat-number">10K+</span>
-                <div class="stat-label">Active Donors</div>
-            </div>
-
-            <div class="stat-item">
-                <div class="stat-icon">
-                    <i class="bi bi-cash-stack"></i>
-                </div>
-                <span class="stat-number">₹5Cr+</span>
-                <div class="stat-label">Funds Raised</div>
-            </div>
-
-            <div class="stat-item">
-                <div class="stat-icon">
-                    <i class="bi bi-rocket-takeoff"></i>
-                </div>
-                <span class="stat-number">1000+</span>
-                <div class="stat-label">Campaigns</div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- CTA Section -->
-<div class="cta-section">
-    <div class="container">
-        <div class="cta-content">
-            <h2 class="cta-heading">Ready to Make a Real Difference?</h2>
-            <p class="cta-subheading">
-                Join thousands of donors supporting verified causes across India. Every contribution creates measurable impact.
-            </p>
-            <div class="cta-actions">
-                <a asp-controller="Campaign" asp-action="Index" class="btn btn-light">
-                    <i class="bi bi-compass"></i> Browse Active Campaigns
+                else if (User.IsInRole("NGO"))
+                {
+                    <a asp-controller="Campaign" asp-action="MyCampaigns" class="btn btn-primary">
+                        <i class="bi bi-megaphone"></i> My Campaigns
+                    </a>
+                    <a asp-controller="Campaign" asp-action="Create" class="btn btn-outline-primary">
+                        <i class="bi bi-plus-circle"></i> Create Campaign
+                    </a>
+                }
+                else if (User.IsInRole("Admin"))
+                {
+                    <a asp-controller="Admin" asp-action="Dashboard" class="btn btn-primary">
+                        <i class="bi bi-shield-check"></i> Admin Dashboard
+                    </a>
+                }
+            }
+            else
+            {
+                <a asp-controller="Campaign" asp-action="Index" class="btn btn-primary">
+                    <i class="bi bi-search"></i> Explore Campaigns
                 </a>
-                @if (User.Identity?.IsAuthenticated != true)
-                {
-                    <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-outline-light">
-                        <i class="bi bi-person-plus"></i> Create Free Account
-                    </a>
-                }
+                <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-outline-primary">
+                    <i class="bi bi-person-plus"></i> Get Started
+                </a>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Trust/Value Section -->
+<div class="trust-section">
+    <div class="container">
+        <div class="trust-grid">
+            <div class="trust-card">
+                <div class="trust-icon">
+                    <i class="bi bi-shield-check"></i>
+                </div>
+                <h3 class="trust-title">Verified NGOs</h3>
+                <p class="trust-description">
+                    Every NGO is thoroughly verified by our admin team. Donate with confidence knowing your contribution reaches legitimate organizations.
+                </p>
             </div>
+
+            <div class="trust-card">
+                <div class="trust-icon">
+                    <i class="bi bi-heart"></i>
+                </div>
+                <h3 class="trust-title">Transparent Giving</h3>
+                <p class="trust-description">
+                    Track every donation with detailed receipts and real-time campaign progress. Complete transparency from start to finish.
+                </p>
+            </div>
+
+            <div class="trust-card">
+                <div class="trust-icon">
+                    <i class="bi bi-lock"></i>
+                </div>
+                <h3 class="trust-title">Secure Donations</h3>
+                <p class="trust-description">
+                    Secure payment processing through Razorpay with instant digital receipts. Your payment information is always protected.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- How CareFund Works Section -->
+<div class="how-it-works-section">
+    <div class="container">
+        <div class="section-heading">
+            <h2 class="section-title">How CareFund Works</h2>
+            <p class="section-subtitle">Three simple steps to create meaningful impact</p>
+        </div>
+        
+        <div class="steps-grid">
+            <div class="step-card">
+                <div class="step-number">1</div>
+                <h3 class="step-title">Find a Cause</h3>
+                <p class="step-description">
+                    Browse active campaigns from verified NGOs. Filter by category, location, or goal to find causes that resonate with you.
+                </p>
+            </div>
+
+            <div class="step-card">
+                <div class="step-number">2</div>
+                <h3 class="step-title">Make a Donation</h3>
+                <p class="step-description">
+                    Choose your contribution amount and complete secure payment through Razorpay. Receive instant confirmation and receipt via email.
+                </p>
+            </div>
+
+            <div class="step-card">
+                <div class="step-number">3</div>
+                <h3 class="step-title">Track Your Impact</h3>
+                <p class="step-description">
+                    Monitor campaign progress and view your complete donation history. Download receipts anytime from your dashboard.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Final CTA Section -->
+<div class="final-cta-section">
+    <div class="container">
+        <h2 class="cta-title">Ready to Make a Difference?</h2>
+        <div class="cta-buttons">
+            <a asp-controller="Campaign" asp-action="Index" class="btn btn-primary">
+                <i class="bi bi-search"></i> Explore Campaigns
+            </a>
+            @if (User.Identity?.IsAuthenticated != true)
+            {
+                <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-outline-primary">
+                    <i class="bi bi-person-plus"></i> Create Account
+                </a>
+            }
         </div>
     </div>
 </div>
