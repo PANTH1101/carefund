@@ -3,71 +3,340 @@
     ViewData["Title"] = "Donation Successful";
 }
 
-<div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow border-success">
-                <div class="card-header bg-success text-white text-center">
-                    <h2 class="mb-0"><i class="bi bi-check-circle-fill"></i> Thank You!</h2>
+<style>
+    .donation-success-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+    
+    .success-card {
+        background: #ffffff;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        overflow: hidden;
+    }
+    
+    .success-header {
+        background: #10b981;
+        color: white;
+        padding: 2rem 1.5rem;
+        text-align: center;
+    }
+    
+    .success-icon {
+        font-size: 3rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .success-title {
+        font-size: 2rem;
+        font-weight: 600;
+        margin: 0;
+    }
+    
+    .success-body {
+        padding: 2rem 1.5rem;
+    }
+    
+    .success-message {
+        background: #d1fae5;
+        border: 1px solid #6ee7b7;
+        border-radius: 0.5rem;
+        padding: 1.25rem;
+        margin-bottom: 2rem;
+        color: #065f46;
+    }
+    
+    .success-message-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .success-message-text {
+        margin: 0;
+    }
+    
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 2rem;
+        margin-bottom: 2rem;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .info-section-label {
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #6c757d;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+    
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 0.75rem;
+        gap: 1rem;
+    }
+    
+    .detail-row:last-child {
+        margin-bottom: 0;
+    }
+    
+    .detail-label {
+        font-weight: 600;
+        color: #495057;
+        font-size: 0.875rem;
+        flex-shrink: 0;
+    }
+    
+    .detail-value {
+        font-size: 0.875rem;
+        color: #2c3e50;
+        text-align: right;
+        word-break: break-word;
+    }
+    
+    .amount-large {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #10b981;
+    }
+    
+    .receipt-badge {
+        background: #3b82f6;
+        color: white;
+        padding: 0.375rem 0.75rem;
+        border-radius: 0.375rem;
+        font-family: 'Courier New', monospace;
+        font-size: 0.875rem;
+        font-weight: 600;
+    }
+    
+    .transaction-id {
+        font-family: 'Courier New', monospace;
+        font-size: 0.75rem;
+        color: #6c757d;
+        word-break: break-all;
+    }
+    
+    .campaign-name {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.375rem;
+    }
+    
+    .ngo-name {
+        color: #6c757d;
+        font-size: 0.9375rem;
+    }
+    
+    .receipt-info-box {
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+        border-radius: 0.5rem;
+        padding: 1rem 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+        color: #1e40af;
+    }
+    
+    .receipt-info-box i {
+        font-size: 1.25rem;
+        flex-shrink: 0;
+    }
+    
+    .email-sent-box {
+        background: #d1fae5;
+        border: 1px solid #6ee7b7;
+        border-radius: 0.5rem;
+        padding: 1rem 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+        color: #065f46;
+    }
+    
+    .email-sent-box i {
+        font-size: 1.25rem;
+        flex-shrink: 0;
+    }
+    
+    .action-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .btn {
+        padding: 0.75rem 1.5rem;
+        font-size: 0.9375rem;
+        font-weight: 500;
+        border-radius: 0.375rem;
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        transition: all 0.15s ease;
+    }
+    
+    .btn-success {
+        background: #10b981;
+        color: white;
+    }
+    
+    .btn-success:hover {
+        background: #059669;
+        color: white;
+    }
+    
+    .btn-primary {
+        background: #3b82f6;
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        background: #2563eb;
+        color: white;
+    }
+    
+    .btn-outline {
+        background: white;
+        color: #495057;
+        border: 1px solid #dee2e6;
+    }
+    
+    .btn-outline:hover {
+        background: #f8f9fa;
+        color: #2c3e50;
+        text-decoration: none;
+    }
+    
+    @@media (max-width: 768px) {
+        .donation-success-container {
+            padding: 1rem;
+        }
+        
+        .success-body {
+            padding: 1.25rem;
+        }
+        
+        .success-title {
+            font-size: 1.5rem;
+        }
+        
+        .success-icon {
+            font-size: 2.5rem;
+        }
+        
+        .info-grid {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+        
+        .detail-row {
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        
+        .detail-value {
+            text-align: left;
+        }
+    }
+</style>
+
+<div class="donation-success-container">
+    <div class="success-card">
+        <!-- Success Header -->
+        <div class="success-header">
+            <div class="success-icon">
+                <i class="bi bi-check-circle-fill"></i>
+            </div>
+            <h1 class="success-title">Thank You!</h1>
+        </div>
+
+        <!-- Success Body -->
+        <div class="success-body">
+            <!-- Success Message -->
+            <div class="success-message">
+                <div class="success-message-title">Your donation was successful!</div>
+                <p class="success-message-text">Thank you for supporting <strong>@Model.Campaign.Title</strong></p>
+            </div>
+
+            <!-- Donation Details Grid -->
+            <div class="info-grid">
+                <!-- Donation Details -->
+                <div>
+                    <div class="info-section-label">Donation Details</div>
+                    <div class="detail-row">
+                        <span class="detail-label">Amount:</span>
+                        <span class="detail-value amount-large">₹@Model.Amount.ToString("N2")</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Date:</span>
+                        <span class="detail-value">@Model.DonationDate.ToString("dd MMMM yyyy, hh:mm tt")</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Receipt Number:</span>
+                        <span class="detail-value">
+                            <span class="receipt-badge">@Model.ReceiptNumber</span>
+                        </span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Transaction ID:</span>
+                        <span class="detail-value">
+                            <span class="transaction-id">@Model.TransactionId</span>
+                        </span>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div class="alert alert-success">
-                        <h4 class="alert-heading">Your donation was successful!</h4>
-                        <p class="mb-0">Thank you for supporting <strong>@Model.Campaign.Title</strong></p>
-                    </div>
 
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <h5 class="text-muted">Donation Details</h5>
-                            <table class="table table-borderless">
-                                <tr>
-                                    <td><strong>Amount:</strong></td>
-                                    <td class="text-end">₹@Model.Amount.ToString("N2")</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Date:</strong></td>
-                                    <td class="text-end">@Model.DonationDate.ToString("MMM dd, yyyy HH:mm")</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Receipt Number:</strong></td>
-                                    <td class="text-end"><span class="badge bg-primary">@Model.ReceiptNumber</span></td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Transaction ID:</strong></td>
-                                    <td class="text-end"><small class="text-muted">@Model.TransactionId</small></td>
-                                </tr>
-                            </table>
-                        </div>
-                        <div class="col-md-6">
-                            <h5 class="text-muted">Campaign</h5>
-                            <p><strong>@Model.Campaign.Title</strong></p>
-                            <p class="text-muted mb-0">by @Model.NGO.Name</p>
-                        </div>
-                    </div>
-
-                    <div class="alert alert-info">
-                        <i class="bi bi-info-circle"></i> Your receipt number is <strong>@Model.ReceiptNumber</strong>. Please save this for your records.
-                    </div>
-
-                    @if (TempData["EmailSent"] != null)
-                    {
-                        <div class="alert alert-success">
-                            <i class="bi bi-envelope-check"></i> @TempData["EmailSent"]
-                        </div>
-                    }
-
-                    <div class="d-grid gap-2">
-                        <a asp-action="DownloadReceipt" asp-route-id="@Model.Id" class="btn btn-success btn-lg">
-                            <i class="bi bi-download"></i> Download Receipt
-                        </a>
-                        <a asp-controller="Campaign" asp-action="Details" asp-route-id="@Model.CampaignId" class="btn btn-primary">
-                            <i class="bi bi-arrow-left"></i> Back to Campaign
-                        </a>
-                        <a asp-controller="Campaign" asp-action="Index" class="btn btn-outline-secondary">
-                            Browse More Campaigns
-                        </a>
-                    </div>
+                <!-- Campaign Details -->
+                <div>
+                    <div class="info-section-label">Campaign</div>
+                    <div class="campaign-name">@Model.Campaign.Title</div>
+                    <div class="ngo-name">by @Model.NGO.Name</div>
                 </div>
+            </div>
+
+            <!-- Receipt Information -->
+            <div class="receipt-info-box">
+                <i class="bi bi-info-circle"></i>
+                <span>Your receipt number is <strong>@Model.ReceiptNumber</strong>. Please save this for your records.</span>
+            </div>
+
+            <!-- Email Sent Confirmation -->
+            @if (TempData["EmailSent"] != null)
+            {
+                <div class="email-sent-box">
+                    <i class="bi bi-envelope-check"></i>
+                    <span>@TempData["EmailSent"]</span>
+                </div>
+            }
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <a asp-action="DownloadReceipt" asp-route-id="@Model.Id" class="btn btn-success">
+                    <i class="bi bi-download"></i> Download Receipt
+                </a>
+                <a asp-controller="Campaign" asp-action="Details" asp-route-id="@Model.CampaignId" class="btn btn-primary">
+                    <i class="bi bi-arrow-left"></i> Back to Campaign
+                </a>
+                <a asp-controller="Campaign" asp-action="Index" class="btn btn-outline">
+                    Browse More Campaigns
+                </a>
             </div>
         </div>
     </div>

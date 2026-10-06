@@ -4,73 +4,287 @@
     var campaign = ViewBag.Campaign as NGODonationSystem.Models.Campaign;
 }
 
-<div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white">
-                    <h3 class="mb-0">Make a Donation</h3>
-                </div>
-                <div class="card-body">
-                    @if (campaign != null)
-                    {
-                        <div class="alert alert-info">
-                            <h5><i class="bi bi-megaphone"></i> @campaign.Title</h5>
-                            <p class="mb-0">by <strong>@campaign.NGO.Name</strong></p>
-                        </div>
-                    }
+<style>
+    .donation-create-container {
+        max-width: 700px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+    
+    .page-header {
+        margin-bottom: 2rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .page-title {
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin: 0;
+    }
+    
+    .donation-card {
+        background: #ffffff;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        padding: 2rem;
+    }
+    
+    .campaign-info-box {
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+        border-radius: 0.5rem;
+        padding: 1.25rem;
+        margin-bottom: 2rem;
+    }
+    
+    .campaign-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #6c757d;
+        font-weight: 600;
+        margin-bottom: 0.375rem;
+    }
+    
+    .campaign-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+    }
+    
+    .ngo-info {
+        font-size: 0.875rem;
+        color: #6c757d;
+    }
+    
+    .section-label {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 1rem;
+    }
+    
+    .amount-buttons {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .amount-btn {
+        background: white;
+        border: 1px solid #dee2e6;
+        color: #495057;
+        padding: 0.75rem;
+        border-radius: 0.375rem;
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.15s ease;
+    }
+    
+    .amount-btn:hover {
+        border-color: #3b82f6;
+        color: #3b82f6;
+        background: #eff6ff;
+    }
+    
+    .amount-btn.active {
+        background: #3b82f6;
+        border-color: #3b82f6;
+        color: white;
+    }
+    
+    .form-section {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-label {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-control {
+        border: 1px solid #dee2e6;
+        border-radius: 0.375rem;
+        padding: 0.625rem 0.75rem;
+        font-size: 0.9375rem;
+    }
+    
+    .form-control:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.1);
+    }
+    
+    .input-group-text {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        color: #495057;
+        font-weight: 500;
+    }
+    
+    .helper-text {
+        font-size: 0.8125rem;
+        color: #6c757d;
+        margin-top: 0.375rem;
+    }
+    
+    .checkbox-container {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.5rem;
+        margin-bottom: 0.375rem;
+    }
+    
+    .form-check-input {
+        margin-top: 0.125rem;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #e9ecef;
+    }
+    
+    .btn {
+        padding: 0.625rem 1.5rem;
+        font-size: 0.9375rem;
+        font-weight: 500;
+        border-radius: 0.375rem;
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        transition: all 0.15s ease;
+    }
+    
+    .btn-primary {
+        background: #3b82f6;
+        color: white;
+        flex: 1;
+    }
+    
+    .btn-primary:hover {
+        background: #2563eb;
+        color: white;
+    }
+    
+    .btn-secondary {
+        background: #f8f9fa;
+        color: #495057;
+        border: 1px solid #dee2e6;
+    }
+    
+    .btn-secondary:hover {
+        background: #e9ecef;
+        color: #2c3e50;
+        text-decoration: none;
+    }
+    
+    .text-danger {
+        color: #dc3545;
+    }
+    
+    .alert-danger {
+        background: #fee;
+        border: 1px solid #fcc;
+        color: #c00;
+        padding: 0.75rem;
+        border-radius: 0.375rem;
+        margin-bottom: 1rem;
+    }
+    
+    @@media (max-width: 768px) {
+        .donation-create-container {
+            padding: 1rem;
+        }
+        
+        .donation-card {
+            padding: 1.25rem;
+        }
+        
+        .amount-buttons {
+            grid-template-columns: 1fr 1fr;
+        }
+        
+        .action-buttons {
+            flex-direction: column;
+        }
+        
+        .btn {
+            width: 100%;
+        }
+    }
+</style>
 
-                    <form action="/Donation/Create" method="post">
-                        <input type="hidden" name="CampaignId" value="@Model.CampaignId" />
-                        @Html.AntiForgeryToken()
-                        @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+<div class="donation-create-container">
+    <div class="page-header">
+        <h1 class="page-title">Make a Donation</h1>
+    </div>
 
-                        <div class="mb-4">
-                            <label class="form-label fw-bold">Select Donation Amount</label>
-                            <div class="row g-3">
-                                <div class="col-6 col-md-3">
-                                    <button type="button" class="btn btn-outline-primary w-100 amount-btn" data-amount="100">Rs.100</button>
-                                </div>
-                                <div class="col-6 col-md-3">
-                                    <button type="button" class="btn btn-outline-primary w-100 amount-btn" data-amount="500">Rs.500</button>
-                                </div>
-                                <div class="col-6 col-md-3">
-                                    <button type="button" class="btn btn-outline-primary w-100 amount-btn" data-amount="1000">Rs.1000</button>
-                                </div>
-                                <div class="col-6 col-md-3">
-                                    <button type="button" class="btn btn-outline-primary w-100 amount-btn" data-amount="5000">Rs.5000</button>
-                                </div>
-                            </div>
-                        </div>
+    <div class="donation-card">
+        @if (campaign != null)
+        {
+            <div class="campaign-info-box">
+                <div class="campaign-label">Campaign</div>
+                <div class="campaign-title">@campaign.Title</div>
+                <div class="ngo-info">by <strong>@campaign.NGO.Name</strong></div>
+            </div>
+        }
 
-                        <div class="mb-4">
-                            <label for="Amount" class="form-label fw-bold">Donation Amount (Rs.)</label>
-                            <div class="input-group">
-                                <span class="input-group-text">Rs.</span>
-                                <input type="number" id="customAmount" name="Amount" class="form-control" placeholder="Enter custom amount" min="1" step="0.01" value="@Model.Amount" />
-                            </div>
-                            @Html.ValidationMessageFor(m => m.Amount, "", new { @class = "text-danger" })
-                            <small class="form-text text-muted">Minimum amount: Rs.1</small>
-                        </div>
+        <form action="/Donation/Create" method="post">
+            <input type="hidden" name="CampaignId" value="@Model.CampaignId" />
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
 
-                        <div class="mb-4">
-                            <div class="form-check">
-                                <input type="checkbox" id="IsAnonymous" name="IsAnonymous" class="form-check-input" value="true" @(Model.IsAnonymous ? "checked" : "") />
-                                <label class="form-check-label" for="IsAnonymous">Make this donation anonymous</label>
-                            </div>
-                            <small class="form-text text-muted">Your name will not be shown to the NGO</small>
-                        </div>
-
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary btn-lg">
-                                <i class="bi bi-arrow-right-circle"></i> Review Donation
-                            </button>
-                            <a href="/Campaign/Details/@Model.CampaignId" class="btn btn-secondary">Cancel</a>
-                        </div>
-                    </form>
+            <div class="form-section">
+                <div class="section-label">Select Donation Amount</div>
+                <div class="amount-buttons">
+                    <button type="button" class="amount-btn" data-amount="100">₹100</button>
+                    <button type="button" class="amount-btn" data-amount="500">₹500</button>
+                    <button type="button" class="amount-btn" data-amount="1000">₹1,000</button>
+                    <button type="button" class="amount-btn" data-amount="5000">₹5,000</button>
                 </div>
             </div>
-        </div>
+
+            <div class="form-section">
+                <label for="customAmount" class="form-label">Donation Amount (₹) <span class="text-danger">*</span></label>
+                <div class="input-group">
+                    <span class="input-group-text">₹</span>
+                    <input type="number" id="customAmount" name="Amount" class="form-control" placeholder="Enter custom amount" min="1" step="0.01" value="@Model.Amount" />
+                </div>
+                @Html.ValidationMessageFor(m => m.Amount, "", new { @class = "text-danger helper-text" })
+                <div class="helper-text">Minimum amount: ₹1</div>
+            </div>
+
+            <div class="form-section">
+                <div class="checkbox-container">
+                    <input type="checkbox" id="IsAnonymous" name="IsAnonymous" class="form-check-input" value="true" @(Model.IsAnonymous ? "checked" : "") />
+                    <div>
+                        <label class="form-check-label" for="IsAnonymous">Make this donation anonymous</label>
+                        <div class="helper-text">Your name will not be shown to the NGO</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-arrow-right-circle"></i> Review Donation
+                </button>
+                <a href="/Campaign/Details/@Model.CampaignId" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
     </div>
 </div>
 
