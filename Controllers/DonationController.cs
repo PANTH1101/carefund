@@ -56,7 +56,7 @@ namespace NGODonationSystem.Controllers
 
             // Calculate raised amount
             var raisedAmount = campaign.Donations
-                .Where(d => d.Status == "Success" || d.Status == "Completed")
+                .Where(d => d.Status == "Success")
                 .Sum(d => d.Amount);
 
             // Check campaign status using centralized extension
@@ -104,7 +104,7 @@ namespace NGODonationSystem.Controllers
 
             // Calculate raised amount
             var raisedAmount = campaign.Donations
-                .Where(d => d.Status == "Success" || d.Status == "Completed")
+                .Where(d => d.Status == "Success")
                 .Sum(d => d.Amount);
 
             // Check campaign can accept donations
@@ -176,7 +176,7 @@ namespace NGODonationSystem.Controllers
 
             // Calculate raised amount
             var raisedAmount = campaign.Donations
-                .Where(d => d.Status == "Success" || d.Status == "Completed")
+                .Where(d => d.Status == "Success")
                 .Sum(d => d.Amount);
 
             // Check campaign can accept donations

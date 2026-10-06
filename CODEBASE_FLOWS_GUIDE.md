@@ -340,7 +340,6 @@ await _context.SaveChangesAsync();
    ├── Uploads logo to wwwroot/uploads/campaigns/{campaign-id}/
    ├── Sets initial values:
    │   ├── RaisedAmount = 0
-   │   ├── IsCancelled = false
    │   └── NGOId = current user's NGO ID
    ├── Saves to database
    └── Redirects to Campaign/MyCampaigns
@@ -358,8 +357,7 @@ var campaign = new Campaign
     RaisedAmount = 0,
     StartDate = model.StartDate,
     EndDate = model.EndDate,
-    NGOId = ngo.Id,
-    IsCancelled = false
+    NGOId = ngo.Id
 };
 
 // Handle logo upload
@@ -394,9 +392,6 @@ await _context.SaveChangesAsync();
 // CampaignExtensions.cs - GetStatus()
 public static string GetStatus(this Campaign campaign)
 {
-    if (campaign.IsCancelled)
-        return "Cancelled";
-    
     var now = DateTime.UtcNow.Date;
     
     if (now < campaign.StartDate)
@@ -424,7 +419,6 @@ public static bool CanAcceptDonations(this Campaign campaign)
 - **Active:** Between StartDate and EndDate, not cancelled, goal not reached
 - **Goal Reached:** RaisedAmount >= GoalAmount (can still accept donations)
 - **Completed:** EndDate has passed
-- **Cancelled:** IsCancelled = true
 
 ---
 
@@ -508,8 +502,8 @@ var campaigns = _context.Campaigns
     .AsQueryable();
 
 // Only show Active campaigns by default
-campaigns = campaigns.Where(c => !c.IsCancelled 
-    && c.StartDate <= DateTime.UtcNow 
+campaigns = campaigns.Where(c => 
+    c.StartDate <= DateTime.UtcNow 
     && c.EndDate >= DateTime.UtcNow);
 
 if (!string.IsNullOrWhiteSpace(search))
@@ -1360,7 +1354,6 @@ public async Task<IActionResult> Index(string search, string category, string st
     if (string.IsNullOrWhiteSpace(status) || status == "Active")
     {
         campaigns = campaigns.Where(c => 
-            !c.IsCancelled &&
             c.StartDate <= DateTime.UtcNow &&
             c.EndDate >= DateTime.UtcNow &&
             c.RaisedAmount < c.GoalAmount
@@ -1651,8 +1644,7 @@ Payment
 
 ### Database Migrations Applied
 
-1. `20261005153828_AddIsCancelledToCampaign`
-2. `20261005164028_AddStructuredNGOFields`
+1. `20261005164028_AddStructuredNGOFields`
 
 ---
 

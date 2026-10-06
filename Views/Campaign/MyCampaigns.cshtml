@@ -21,7 +21,7 @@
         <div class="row">
             @foreach (var campaign in Model)
             {
-                var raisedAmount = campaign.Donations?.Where(d => d.Status == "Success" || d.Status == "Completed").Sum(d => d.Amount) ?? 0;
+                var raisedAmount = campaign.Donations?.Where(d => d.Status == "Success").Sum(d => d.Amount) ?? 0;
                 var status = campaign.GetStatus(raisedAmount);
                 var progressPercentage = campaign.TargetAmount > 0 ? (int)((raisedAmount / campaign.TargetAmount) * 100) : 0;
                 var hasDonations = campaign.Donations?.Any() ?? false;
@@ -31,7 +31,6 @@
                     "Completed" => "bg-success",
                     "Active" => "bg-primary",
                     "Expired" => "bg-secondary",
-                    "Cancelled" => "bg-danger",
                     "Scheduled" => "bg-info",
                     _ => "bg-secondary"
                 };
@@ -64,7 +63,7 @@
                             
                             <div class="btn-group w-100">
                                 <a asp-action="Details" asp-route-id="@campaign.Id" class="btn btn-sm btn-outline-primary">View</a>
-                                @if (!hasDonations && status != "Cancelled" && status != "Completed")
+                                @if (!hasDonations && status != "Completed")
                                 {
                                     <a asp-action="Edit" asp-route-id="@campaign.Id" class="btn btn-sm btn-outline-secondary">Edit</a>
                                 }

@@ -9,26 +9,18 @@ namespace NGODonationSystem.Extensions
     {
         /// <summary>
         /// Calculate the current status of a campaign based on:
-        /// - Cancellation flag
         /// - Raised amount vs target
         /// - Current date vs start/deadline dates
         /// 
         /// Status Priority:
-        /// 1. Cancelled (if IsCancelled is true)
-        /// 2. Completed (if raised >= target)
-        /// 3. Expired (if deadline passed)
-        /// 4. Active (if between start and deadline)
-        /// 5. Scheduled (if before start date)
+        /// 1. Completed (if raised >= target)
+        /// 2. Expired (if deadline passed)
+        /// 3. Active (if between start and deadline)
+        /// 4. Scheduled (if before start date)
         /// </summary>
         public static string GetStatus(this Campaign campaign, decimal raisedAmount)
         {
             var today = DateTime.Today;
-
-            // Check if manually cancelled
-            if (campaign.IsCancelled)
-            {
-                return "Cancelled";
-            }
 
             // Check if completed (target reached)
             if (raisedAmount >= campaign.TargetAmount)

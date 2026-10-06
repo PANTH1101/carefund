@@ -52,7 +52,7 @@ namespace NGODonationSystem.Controllers
             var successfulDonations = await _context.Donations
                 .Include(d => d.Campaign)
                 .Where(d => d.DonorId == userId)
-                .Where(d => d.Status == "Success" || d.Status == "Completed")
+                .Where(d => d.Status == "Success")
                 .ToListAsync();
 
             // Total Donated
@@ -75,7 +75,7 @@ namespace NGODonationSystem.Controllers
                 .Include(d => d.Campaign)
                 .Include(d => d.NGO)
                 .Where(d => d.DonorId == userId)
-                .Where(d => d.Status == "Success" || d.Status == "Completed")
+                .Where(d => d.Status == "Success")
                 .OrderByDescending(d => d.DonationDate)
                 .Take(5)
                 .Select(d => new RecentDonationItem
@@ -100,7 +100,6 @@ namespace NGODonationSystem.Controllers
                 .Include(c => c.NGO)
                 .Include(c => c.Donations)
                 .Where(c => c.NGO.VerificationStatus == "Approved")
-                .Where(c => !c.IsCancelled)
                 .Where(c => c.StartDate <= today)
                 .Where(c => c.Deadline >= today);
 
@@ -111,7 +110,7 @@ namespace NGODonationSystem.Controllers
                 {
                     Campaign = c,
                     RaisedAmount = c.Donations
-                        .Where(d => d.Status == "Success" || d.Status == "Completed")
+                        .Where(d => d.Status == "Success")
                         .Sum(d => d.Amount)
                 })
                 .ToListAsync();

@@ -267,7 +267,7 @@
         <div class="row">
             @foreach (var campaign in Model)
             {
-                var raisedAmount = campaign.Donations?.Where(d => d.Status == "Success" || d.Status == "Completed").Sum(d => d.Amount) ?? 0;
+                var raisedAmount = campaign.Donations?.Where(d => d.Status == "Success").Sum(d => d.Amount) ?? 0;
                 var status = campaign.GetStatus(raisedAmount);
                 var progressPercentage = campaign.TargetAmount > 0 ? (int)Math.Min((raisedAmount / campaign.TargetAmount) * 100, 100) : 0;
 

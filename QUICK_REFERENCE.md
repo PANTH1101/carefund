@@ -75,7 +75,7 @@ Key Files:
 │  4. Submit                                      │
 │     → CampaignController.cs (Create POST)       │
 │     → Creates Campaign record                   │
-│     → Initial: RaisedAmount=0, IsCancelled=false│
+│     → Initial: RaisedAmount=0                   │
 │  5. Redirect to /Campaign/MyCampaigns           │
 └─────────────────────────────────────────────────┘
 
@@ -85,7 +85,6 @@ Campaign Status (CampaignExtensions.cs):
 │ Active   │ StartDate ≤ Today ≤ EndDate          │
 │ Goal Met │ RaisedAmount ≥ GoalAmount            │
 │ Completed│ EndDate < Today                      │
-│ Cancelled│ IsCancelled = true                   │
 └──────────┴──────────────────────────────────────┘
 
 Only "Active" and "Goal Met" campaigns accept donations!
@@ -466,7 +465,6 @@ Data/
 └── ApplicationDbContext.cs    → EF Core DbContext
 
 Migrations/
-├── 20261005153828_AddIsCancelledToCampaign.*
 └── 20261005164028_AddStructuredNGOFields.*
 
 Views/
@@ -544,7 +542,6 @@ public async Task<IActionResult> Create(CreateCampaignViewModel model)
 // Extensions/CampaignExtensions.cs - Line ~10
 public static string GetStatus(this Campaign campaign)
 {
-    if (campaign.IsCancelled) return "Cancelled";
     if (now < campaign.StartDate) return "Upcoming";
     if (now > campaign.EndDate) return "Completed";
     if (campaign.RaisedAmount >= campaign.GoalAmount) return "Goal Reached";

@@ -41,7 +41,6 @@ namespace NGODonationSystem.Controllers
                 .Include(c => c.NGO)
                 .Include(c => c.Donations)
                 .Where(c => c.NGO.VerificationStatus == "Approved")
-                .Where(c => !c.IsCancelled) // Exclude cancelled campaigns
                 .Where(c => c.StartDate <= today) // Must have started
                 .Where(c => c.Deadline >= today); // Must not be expired
 
@@ -66,7 +65,7 @@ namespace NGODonationSystem.Controllers
                 {
                     Campaign = c,
                     RaisedAmount = c.Donations
-                        .Where(d => d.Status == "Success" || d.Status == "Completed")
+                        .Where(d => d.Status == "Success")
                         .Sum(d => d.Amount)
                 })
                 .ToListAsync();
@@ -98,7 +97,7 @@ namespace NGODonationSystem.Controllers
 
             // Calculate raised amount from successful donations
             decimal raisedAmount = campaign.Donations
-                .Where(d => d.Status == "Success" || d.Status == "Completed")
+                .Where(d => d.Status == "Success")
                 .Sum(d => d.Amount);
 
             ViewBag.RaisedAmount = raisedAmount;
@@ -106,7 +105,7 @@ namespace NGODonationSystem.Controllers
                 ? Math.Min((raisedAmount / campaign.TargetAmount) * 100, 100)
                 : 0;
             ViewBag.DonorCount = campaign.Donations
-                .Where(d => d.Status == "Success" || d.Status == "Completed")
+                .Where(d => d.Status == "Success")
                 .Select(d => d.DonorId)
                 .Distinct()
                 .Count();
@@ -244,6 +243,7 @@ namespace NGODonationSystem.Controllers
         }
 
         // GET: Campaign/Edit/5
+        // Loads the existing campaign into the edit form
         [Authorize(Roles = "NGO")]
         public async Task<IActionResult> Edit(int id)
         {
@@ -287,6 +287,7 @@ namespace NGODonationSystem.Controllers
         }
 
         // POST: Campaign/Edit/5
+        // saves the edited campaign details
         [Authorize(Roles = "NGO")]
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -395,7 +396,7 @@ namespace NGODonationSystem.Controllers
             // Check if campaign has donations
             if (campaign.Donations.Any())
             {
-                TempData["ErrorMessage"] = "Cannot delete campaign that has donations. Consider canceling it instead.";
+                TempData["ErrorMessage"] = "Cannot delete campaign that has donations.";
                 return RedirectToAction(nameof(Details), new { id = campaign.Id });
             }
 
@@ -404,41 +405,6 @@ namespace NGODonationSystem.Controllers
 
             TempData["SuccessMessage"] = "Campaign deleted successfully.";
             return RedirectToAction(nameof(MyCampaigns));
-        }
-
-        // POST: Campaign/Cancel/5
-        [Authorize(Roles = "NGO")]
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Cancel(int id)
-        {
-            var ngo = await GetLoggedInNGOAsync();
-            if (ngo == null)
-            {
-                return NotFound("NGO profile not found.");
-            }
-
-            var campaign = await _context.Campaigns
-                .FirstOrDefaultAsync(c => c.Id == id && c.NGOId == ngo.Id);
-
-            if (campaign == null)
-            {
-                return NotFound();
-            }
-
-            // Check if already cancelled
-            if (campaign.IsCancelled)
-            {
-                TempData["ErrorMessage"] = "Campaign is already cancelled.";
-                return RedirectToAction(nameof(Details), new { id = campaign.Id });
-            }
-
-            // Mark campaign as cancelled (permanent action)
-            campaign.IsCancelled = true;
-            await _context.SaveChangesAsync();
-
-            TempData["SuccessMessage"] = "Campaign has been cancelled. This action is permanent.";
-            return RedirectToAction(nameof(Details), new { id = campaign.Id });
         }
 
         // Helper method to get logged-in NGO
