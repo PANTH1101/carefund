@@ -3,104 +3,326 @@
     ViewData["Title"] = "Verification Status";
 }
 
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow">
-                <div class="card-header @(Model.VerificationStatus == "Approved" ? "bg-success" : Model.VerificationStatus == "Rejected" ? "bg-danger" : "bg-warning text-dark") text-white">
-                    <h3 class="mb-0">NGO Verification Status</h3>
-                </div>
-                <div class="card-body">
-                    <div class="row mb-4">
-                        <div class="col-md-4 fw-bold">NGO Name:</div>
-                        <div class="col-md-8">@Model.Name</div>
-                    </div>
+<style>
+    .verification-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+    
+    .page-header {
+        margin-bottom: 2rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .page-title {
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin: 0;
+    }
+    
+    .verification-card {
+        background: #ffffff;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    
+    .card-header-blue {
+        background: #3b82f6;
+        color: white;
+        padding: 1.25rem 1.5rem;
+        border-radius: 8px 8px 0 0;
+        border-bottom: 1px solid #2563eb;
+    }
+    
+    .card-header-blue h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin: 0;
+    }
+    
+    .card-body-content {
+        padding: 2rem 1.5rem;
+    }
+    
+    .info-row {
+        display: flex;
+        margin-bottom: 1.5rem;
+        gap: 1rem;
+    }
+    
+    .info-label {
+        font-weight: 600;
+        color: #2c3e50;
+        min-width: 150px;
+    }
+    
+    .info-value {
+        color: #495057;
+        flex: 1;
+    }
+    
+    .status-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 0.375rem;
+        font-size: 1rem;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .status-badge.approved {
+        background: #d1fae5;
+        color: #065f46;
+        border: 1px solid #6ee7b7;
+    }
+    
+    .status-badge.pending {
+        background: #fef3c7;
+        color: #92400e;
+        border: 1px solid #fde047;
+    }
+    
+    .status-badge.rejected {
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fca5a5;
+    }
+    
+    .divider {
+        border: 0;
+        border-top: 1px solid #e9ecef;
+        margin: 1.5rem 0;
+    }
+    
+    .status-alert {
+        padding: 1.25rem;
+        border-radius: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .status-alert.success {
+        background: #f0fdf4;
+        border: 1px solid #bbf7d0;
+        color: #15803d;
+    }
+    
+    .status-alert.warning {
+        background: #fffbeb;
+        border: 1px solid #fde047;
+        color: #92400e;
+    }
+    
+    .status-alert.danger {
+        background: #fef2f2;
+        border: 1px solid #fca5a5;
+        color: #991b1b;
+    }
+    
+    .status-alert h5 {
+        font-size: 1.125rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .status-alert p {
+        margin-bottom: 0;
+        line-height: 1.6;
+    }
+    
+    .info-section {
+        color: #495057;
+        line-height: 1.7;
+    }
+    
+    .info-section strong {
+        color: #2c3e50;
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+    
+    .info-list {
+        margin: 0.5rem 0 0 1.25rem;
+        padding: 0;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 1.5rem;
+    }
+    
+    .btn {
+        padding: 0.625rem 1.5rem;
+        font-size: 0.9375rem;
+        font-weight: 500;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .btn-primary {
+        background: #3b82f6;
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        background: #2563eb;
+        color: white;
+    }
+    
+    .btn-secondary {
+        background: #f8f9fa;
+        color: #495057;
+        border: 1px solid #dee2e6;
+    }
+    
+    .btn-secondary:hover {
+        background: #e9ecef;
+        color: #2c3e50;
+    }
+    
+    @@media (max-width: 768px) {
+        .verification-container {
+            padding: 1rem;
+        }
+        
+        .info-row {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .info-label {
+            min-width: auto;
+        }
+        
+        .action-buttons {
+            flex-direction: column;
+        }
+        
+        .btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
 
-                    <div class="row mb-4">
-                        <div class="col-md-4 fw-bold">Current Status:</div>
-                        <div class="col-md-8">
-                            @if (Model.VerificationStatus == "Approved")
-                            {
-                                <span class="badge bg-success fs-5">
-                                    <i class="bi bi-check-circle-fill"></i> Approved
-                                </span>
-                            }
-                            else if (Model.VerificationStatus == "Rejected")
-                            {
-                                <span class="badge bg-danger fs-5">
-                                    <i class="bi bi-x-circle-fill"></i> Rejected
-                                </span>
-                            }
-                            else
-                            {
-                                <span class="badge bg-warning text-dark fs-5">
-                                    <i class="bi bi-hourglass-split"></i> Pending
-                                </span>
-                            }
-                        </div>
-                    </div>
+<div class="verification-container">
+    <div class="page-header">
+        <h1 class="page-title">NGO Verification Status</h1>
+    </div>
 
-                    <hr />
+    <div class="verification-card">
+        <div class="card-header-blue">
+            <h3>Verification Information</h3>
+        </div>
+        <div class="card-body-content">
+            <div class="info-row">
+                <div class="info-label">NGO Name:</div>
+                <div class="info-value">@Model.Name</div>
+            </div>
 
-                    @if (Model.VerificationStatus == "Pending")
+            <div class="info-row">
+                <div class="info-label">Current Status:</div>
+                <div class="info-value">
+                    @if (Model.VerificationStatus == "Approved")
                     {
-                        <div class="alert alert-warning">
-                            <h5><i class="bi bi-info-circle"></i> Verification Pending</h5>
-                            <p class="mb-0">
-                                Your NGO verification is currently pending. Our admin team is reviewing your registration information 
-                                and verification documents. You will be notified once your verification is complete.
-                            </p>
-                        </div>
-                        <p class="text-muted">
-                            <strong>What happens next?</strong><br />
-                            - Our team will review your NGO information<br />
-                            - We will verify your documents<br />
-                            - You will receive an update on your verification status
-                        </p>
-                    }
-                    else if (Model.VerificationStatus == "Approved")
-                    {
-                        <div class="alert alert-success">
-                            <h5><i class="bi bi-check-circle-fill"></i> Congratulations!</h5>
-                            <p class="mb-0">
-                                Your NGO has been approved! You can now access all features available to verified NGOs.
-                            </p>
-                        </div>
-                        <p class="text-muted">
-                            <strong>What you can do now:</strong><br />
-                            - Create fundraising campaigns<br />
-                            - Manage your NGO profile<br />
-                            - Receive donations from donors
-                        </p>
-                        <div class="mt-3">
-                            <a asp-controller="Profile" asp-action="Index" class="btn btn-primary">
-                                <i class="bi bi-person"></i> View Profile
-                            </a>
-                        </div>
+                        <span class="status-badge approved">
+                            <i class="bi bi-check-circle-fill"></i> Approved
+                        </span>
                     }
                     else if (Model.VerificationStatus == "Rejected")
                     {
-                        <div class="alert alert-danger">
-                            <h5><i class="bi bi-exclamation-triangle-fill"></i> Verification Rejected</h5>
-                            <p class="mb-0">
-                                Unfortunately, your NGO verification was rejected. This may be due to incomplete information 
-                                or issues with the verification documents.
-                            </p>
-                        </div>
-                        <p class="text-muted">
-                            <strong>What should you do?</strong><br />
-                            - Review your NGO information for accuracy<br />
-                            - Ensure all documents are valid and clear<br />
-                            - Contact our support team for more information
-                        </p>
+                        <span class="status-badge rejected">
+                            <i class="bi bi-x-circle-fill"></i> Rejected
+                        </span>
                     }
-
-                    <div class="mt-4">
-                        <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">
-                            <i class="bi bi-house"></i> Back to Home
-                        </a>
-                    </div>
+                    else
+                    {
+                        <span class="status-badge pending">
+                            <i class="bi bi-hourglass-split"></i> Pending
+                        </span>
+                    }
                 </div>
+            </div>
+
+            <hr class="divider" />
+
+            @if (Model.VerificationStatus == "Pending")
+            {
+                <div class="status-alert warning">
+                    <h5><i class="bi bi-info-circle"></i> Verification Pending</h5>
+                    <p>
+                        Your NGO verification is currently pending. Our admin team is reviewing your registration information 
+                        and verification documents. You will be notified once your verification is complete.
+                    </p>
+                </div>
+                <div class="info-section">
+                    <strong>What happens next?</strong>
+                    <ul class="info-list">
+                        <li>Our team will review your NGO information</li>
+                        <li>We will verify your documents</li>
+                        <li>You will receive an update on your verification status</li>
+                    </ul>
+                </div>
+            }
+            else if (Model.VerificationStatus == "Approved")
+            {
+                <div class="status-alert success">
+                    <h5><i class="bi bi-check-circle-fill"></i> Congratulations!</h5>
+                    <p>
+                        Your NGO has been approved! You can now access all features available to verified NGOs.
+                    </p>
+                </div>
+                <div class="info-section">
+                    <strong>What you can do now:</strong>
+                    <ul class="info-list">
+                        <li>Create fundraising campaigns</li>
+                        <li>Manage your NGO profile</li>
+                        <li>Receive donations from donors</li>
+                    </ul>
+                </div>
+            }
+            else if (Model.VerificationStatus == "Rejected")
+            {
+                <div class="status-alert danger">
+                    <h5><i class="bi bi-exclamation-triangle-fill"></i> Verification Rejected</h5>
+                    <p>
+                        Unfortunately, your NGO verification was rejected. This may be due to incomplete information 
+                        or issues with the verification documents.
+                    </p>
+                </div>
+                <div class="info-section">
+                    <strong>What should you do?</strong>
+                    <ul class="info-list">
+                        <li>Review your NGO information for accuracy</li>
+                        <li>Ensure all documents are valid and clear</li>
+                        <li>Contact our support team for more information</li>
+                    </ul>
+                </div>
+            }
+
+            <div class="action-buttons">
+                @if (Model.VerificationStatus == "Approved")
+                {
+                    <a href="@Url.Action("Index", "Profile")" class="btn btn-primary">
+                        <i class="bi bi-person"></i> View Profile
+                    </a>
+                }
+                <a href="@Url.Action("Index", "Home")" class="btn btn-secondary">
+                    <i class="bi bi-house"></i> Back to Home
+                </a>
             </div>
         </div>
     </div>
