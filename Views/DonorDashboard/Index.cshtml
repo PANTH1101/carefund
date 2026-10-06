@@ -1,0 +1,424 @@
+@model NGODonationSystem.ViewModels.DonorDashboardViewModel
+@{
+    ViewData["Title"] = "Donor Dashboard";
+}
+
+<style>
+    /* Professional Minimal Dashboard Styles */
+    .dashboard-header {
+        margin-bottom: 2rem;
+    }
+    
+    .dashboard-title {
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: #212529;
+        margin-bottom: 0.25rem;
+    }
+    
+    .dashboard-subtitle {
+        font-size: 0.95rem;
+        color: #6c757d;
+        font-weight: 400;
+    }
+    
+    .stats-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.25rem;
+        margin-bottom: 2.5rem;
+    }
+    
+    .stat-card {
+        background: #ffffff;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 1.5rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        transition: box-shadow 0.2s ease;
+    }
+    
+    .stat-card:hover {
+        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+    
+    .stat-label {
+        font-size: 0.8125rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #6c757d;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 600;
+        color: #212529;
+        line-height: 1.2;
+    }
+    
+    .stat-icon {
+        color: #0d6efd;
+        font-size: 1.25rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.25rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .section-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #212529;
+        margin: 0;
+    }
+    
+    .section-link {
+        font-size: 0.875rem;
+        color: #0d6efd;
+        text-decoration: none;
+        font-weight: 500;
+    }
+    
+    .section-link:hover {
+        color: #0a58ca;
+        text-decoration: underline;
+    }
+    
+    .donations-table {
+        background: #ffffff;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        overflow: hidden;
+        margin-bottom: 2.5rem;
+    }
+    
+    .donations-table table {
+        margin-bottom: 0;
+    }
+    
+    .donations-table th {
+        background: #f8f9fa;
+        font-weight: 600;
+        font-size: 0.8125rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #495057;
+        border-bottom: 2px solid #e9ecef;
+        padding: 0.875rem 1rem;
+    }
+    
+    .donations-table td {
+        padding: 1rem;
+        vertical-align: middle;
+        border-bottom: 1px solid #f1f3f5;
+        color: #495057;
+    }
+    
+    .donations-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+    
+    .donations-table tbody tr:hover {
+        background-color: #f8f9fa;
+        cursor: pointer;
+    }
+    
+    .campaign-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.25rem;
+        margin-bottom: 2.5rem;
+    }
+    
+    .campaign-card {
+        background: #ffffff;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        transition: box-shadow 0.2s ease, transform 0.2s ease;
+        text-decoration: none;
+        color: inherit;
+        display: block;
+    }
+    
+    .campaign-card:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        transform: translateY(-2px);
+        text-decoration: none;
+    }
+    
+    .campaign-image {
+        width: 100%;
+        height: 160px;
+        object-fit: cover;
+        background: #f8f9fa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .campaign-body {
+        padding: 1.25rem;
+    }
+    
+    .campaign-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #212529;
+        margin-bottom: 0.5rem;
+        line-height: 1.4;
+    }
+    
+    .campaign-ngo {
+        font-size: 0.8125rem;
+        color: #6c757d;
+        margin-bottom: 1rem;
+    }
+    
+    .campaign-progress {
+        margin-bottom: 0.75rem;
+    }
+    
+    .progress {
+        height: 6px;
+        background-color: #e9ecef;
+        border-radius: 3px;
+    }
+    
+    .progress-bar {
+        background-color: #0d6efd;
+    }
+    
+    .campaign-stats {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.8125rem;
+        color: #6c757d;
+        margin-bottom: 0.5rem;
+    }
+    
+    .campaign-deadline {
+        font-size: 0.8125rem;
+        color: #6c757d;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+        background: #ffffff;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        margin-bottom: 2.5rem;
+    }
+    
+    .empty-state-icon {
+        font-size: 3rem;
+        color: #dee2e6;
+        margin-bottom: 1rem;
+    }
+    
+    .empty-state-text {
+        color: #6c757d;
+        margin-bottom: 1.5rem;
+    }
+    
+    .badge-status {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+        font-weight: 500;
+    }
+    
+    /* Responsive Design */
+    @@media (max-width: 768px) {
+        .stats-container {
+            grid-template-columns: 1fr;
+        }
+        
+        .campaign-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .donations-table {
+            overflow-x: auto;
+        }
+        
+        .stat-value {
+            font-size: 1.75rem;
+        }
+        
+        .section-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+    }
+</style>
+
+<div class="container" style="max-width: 1200px;">
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+        <h1 class="dashboard-title">Donor Dashboard</h1>
+        <p class="dashboard-subtitle">Welcome back, @Model.DonorName.</p>
+    </div>
+
+    <!-- Summary Statistics -->
+    <div class="stats-container">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="bi bi-currency-rupee"></i>
+            </div>
+            <div class="stat-label">Total Donated</div>
+            <div class="stat-value">₹@Model.TotalDonated.ToString("N0")</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="bi bi-heart-fill"></i>
+            </div>
+            <div class="stat-label">Donations</div>
+            <div class="stat-value">@Model.TotalDonations</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="bi bi-flag-fill"></i>
+            </div>
+            <div class="stat-label">Campaigns Supported</div>
+            <div class="stat-value">@Model.CampaignsSupported</div>
+        </div>
+    </div>
+
+    <!-- Recent Donations -->
+    <div class="section-header">
+        <h2 class="section-title">Recent Donations</h2>
+        @if (Model.RecentDonations.Any())
+        {
+            <a asp-controller="Donation" asp-action="MyDonations" class="section-link">
+                View All Donations →
+            </a>
+        }
+    </div>
+
+    @if (Model.RecentDonations.Any())
+    {
+        <div class="donations-table">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Campaign</th>
+                        <th>NGO</th>
+                        <th class="text-end">Amount</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var donation in Model.RecentDonations)
+                    {
+                        <tr onclick="window.location.href='@Url.Action("DonorDetails", "Donation", new { id = donation.DonationId })'" style="cursor: pointer;">
+                            <td>
+                                <strong>@donation.CampaignTitle</strong>
+                            </td>
+                            <td>@donation.NGOName</td>
+                            <td class="text-end">
+                                <strong>₹@donation.Amount.ToString("N0")</strong>
+                            </td>
+                            <td>@donation.DonationDate.ToString("dd MMM yyyy")</td>
+                            <td>
+                                <span class="badge bg-success badge-status">@donation.Status</span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <i class="bi bi-heart"></i>
+            </div>
+            <p class="empty-state-text">No donations yet. Start making a difference today!</p>
+            <a asp-controller="Campaign" asp-action="Index" class="btn btn-primary">
+                <i class="bi bi-search"></i> Explore Campaigns
+            </a>
+        </div>
+    }
+
+    <!-- Discover Campaigns -->
+    <div class="section-header">
+        <h2 class="section-title">Discover Campaigns</h2>
+        @if (Model.ActiveCampaigns.Any())
+        {
+            <a asp-controller="Campaign" asp-action="Index" class="section-link">
+                View All Campaigns →
+            </a>
+        }
+    </div>
+
+    @if (Model.ActiveCampaigns.Any())
+    {
+        <div class="campaign-grid">
+            @foreach (var campaign in Model.ActiveCampaigns)
+            {
+                <a asp-controller="Campaign" asp-action="Details" asp-route-id="@campaign.CampaignId" class="campaign-card">
+                    @if (campaign.Image != null && campaign.Image.Length > 0)
+                    {
+                        var base64 = Convert.ToBase64String(campaign.Image);
+                        var imgSrc = $"data:{campaign.ImageContentType};base64,{base64}";
+                        <img src="@imgSrc" alt="@campaign.Title" class="campaign-image" />
+                    }
+                    else
+                    {
+                        <div class="campaign-image" style="background: #f8f9fa; display: flex; align-items: center; justify-content: center;">
+                            <i class="bi bi-image text-muted" style="font-size: 2.5rem;"></i>
+                        </div>
+                    }
+
+                    <div class="campaign-body">
+                        <h3 class="campaign-title">@campaign.Title</h3>
+                        <p class="campaign-ngo">
+                            <i class="bi bi-building"></i> @campaign.NGOName
+                        </p>
+
+                        <div class="campaign-progress">
+                            <div class="campaign-stats">
+                                <span><strong>₹@campaign.RaisedAmount.ToString("N0")</strong> raised</span>
+                                <span>₹@campaign.TargetAmount.ToString("N0") goal</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar" role="progressbar" style="width: @campaign.ProgressPercentage%" aria-valuenow="@campaign.ProgressPercentage" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+
+                        <div class="campaign-deadline">
+                            <i class="bi bi-calendar-event"></i> Ends @campaign.Deadline.ToString("dd MMM yyyy")
+                        </div>
+                    </div>
+                </a>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <i class="bi bi-search"></i>
+            </div>
+            <p class="empty-state-text">No active campaigns available right now.</p>
+            <a asp-controller="Campaign" asp-action="Index" class="btn btn-outline-primary">
+                Check All Campaigns
+            </a>
+        </div>
+    }
+</div>
