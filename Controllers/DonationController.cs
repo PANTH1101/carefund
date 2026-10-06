@@ -6,6 +6,7 @@ using NGODonationSystem.Data;
 using NGODonationSystem.Models;
 using NGODonationSystem.ViewModels;
 using NGODonationSystem.Helpers;
+using NGODonationSystem.Extensions;
 using Razorpay.Api;
 using System.Security.Cryptography;
 using System.Text;
@@ -18,15 +19,18 @@ namespace NGODonationSystem.Controllers
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IConfiguration _configuration;
+        private readonly ILogger<DonationController> _logger;
 
         public DonationController(
             ApplicationDbContext context,
             UserManager<ApplicationUser> userManager,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            ILogger<DonationController> logger)
         {
             _context = context;
             _userManager = userManager;
             _configuration = configuration;
+            _logger = logger;
         }
 
         // GET: Donation/Create?campaignId=123
@@ -36,6 +40,7 @@ namespace NGODonationSystem.Controllers
             // Validate campaign
             var campaign = await _context.Campaigns
                 .Include(c => c.NGO)
+                .Include(c => c.Donations)
                 .FirstOrDefaultAsync(c => c.Id == campaignId);
 
             if (campaign == null)
@@ -49,30 +54,24 @@ namespace NGODonationSystem.Controllers
                 return NotFound("This campaign is not available for donations.");
             }
 
-            // Check campaign is active
-            var today = DateTime.Today;
-            if (campaign.Deadline < today)
-            {
-                TempData["ErrorMessage"] = "This campaign has expired and is no longer accepting donations.";
-                return RedirectToAction("Details", "Campaign", new { id = campaignId });
-            }
-
-            // Check if target is already reached
-            var raisedAmount = await _context.Donations
-                .Where(d => d.CampaignId == campaignId)
+            // Calculate raised amount
+            var raisedAmount = campaign.Donations
                 .Where(d => d.Status == "Success" || d.Status == "Completed")
-                .SumAsync(d => d.Amount);
+                .Sum(d => d.Amount);
 
-            if (raisedAmount >= campaign.TargetAmount)
+            // Check campaign status using centralized extension
+            if (!campaign.CanAcceptDonations(raisedAmount))
             {
-                TempData["ErrorMessage"] = "This campaign has already reached its funding goal.";
+                var status = campaign.GetStatus(raisedAmount);
+                TempData["ErrorMessage"] = $"This campaign is {status} and cannot accept donations at this time.";
                 return RedirectToAction("Details", "Campaign", new { id = campaignId });
             }
 
-            // Check campaign started
+            // ENFORCE START DATE: Campaign must have started
+            var today = DateTime.Today;
             if (campaign.StartDate > today)
             {
-                TempData["ErrorMessage"] = "This campaign has not started yet.";
+                TempData["ErrorMessage"] = $"This campaign has not started yet. It will begin on {campaign.StartDate:MMM dd, yyyy}.";
                 return RedirectToAction("Details", "Campaign", new { id = campaignId });
             }
 
@@ -89,6 +88,7 @@ namespace NGODonationSystem.Controllers
             // Re-validate campaign
             var campaign = await _context.Campaigns
                 .Include(c => c.NGO)
+                .Include(c => c.Donations)
                 .FirstOrDefaultAsync(c => c.Id == model.CampaignId);
 
             if (campaign == null)
@@ -102,23 +102,24 @@ namespace NGODonationSystem.Controllers
                 return NotFound("This campaign is not available for donations.");
             }
 
-            // Check campaign is active
-            var today = DateTime.Today;
-            if (campaign.Deadline < today)
+            // Calculate raised amount
+            var raisedAmount = campaign.Donations
+                .Where(d => d.Status == "Success" || d.Status == "Completed")
+                .Sum(d => d.Amount);
+
+            // Check campaign can accept donations
+            if (!campaign.CanAcceptDonations(raisedAmount))
             {
-                TempData["ErrorMessage"] = "This campaign has expired.";
+                var status = campaign.GetStatus(raisedAmount);
+                TempData["ErrorMessage"] = $"This campaign is {status} and cannot accept donations.";
                 return RedirectToAction("Details", "Campaign", new { id = model.CampaignId });
             }
 
-            // Check target not reached
-            var raisedAmount = await _context.Donations
-                .Where(d => d.CampaignId == model.CampaignId)
-                .Where(d => d.Status == "Success" || d.Status == "Completed")
-                .SumAsync(d => d.Amount);
-
-            if (raisedAmount >= campaign.TargetAmount)
+            // ENFORCE START DATE: Campaign must have started
+            var today = DateTime.Today;
+            if (campaign.StartDate > today)
             {
-                TempData["ErrorMessage"] = "Campaign goal already reached.";
+                TempData["ErrorMessage"] = "This campaign has not started yet.";
                 return RedirectToAction("Details", "Campaign", new { id = model.CampaignId });
             }
 
@@ -159,6 +160,7 @@ namespace NGODonationSystem.Controllers
             // Re-validate campaign
             var campaign = await _context.Campaigns
                 .Include(c => c.NGO)
+                .Include(c => c.Donations)
                 .FirstOrDefaultAsync(c => c.Id == model.CampaignId);
 
             if (campaign == null)
@@ -170,6 +172,27 @@ namespace NGODonationSystem.Controllers
             if (campaign.NGO.VerificationStatus != "Approved")
             {
                 return NotFound("This campaign is not available.");
+            }
+
+            // Calculate raised amount
+            var raisedAmount = campaign.Donations
+                .Where(d => d.Status == "Success" || d.Status == "Completed")
+                .Sum(d => d.Amount);
+
+            // Check campaign can accept donations
+            if (!campaign.CanAcceptDonations(raisedAmount))
+            {
+                var status = campaign.GetStatus(raisedAmount);
+                TempData["ErrorMessage"] = $"This campaign is {status} and cannot accept donations.";
+                return RedirectToAction("Details", "Campaign", new { id = model.CampaignId });
+            }
+
+            // ENFORCE START DATE: Campaign must have started
+            var today = DateTime.Today;
+            if (campaign.StartDate > today)
+            {
+                TempData["ErrorMessage"] = "This campaign has not started yet.";
+                return RedirectToAction("Details", "Campaign", new { id = model.CampaignId });
             }
 
             // Validate amount
@@ -440,10 +463,12 @@ namespace NGODonationSystem.Controllers
                 string fileName = $"CareFund-Receipt-{donation.ReceiptNumber}.pdf";
                 return File(pdfBytes, "application/pdf", fileName);
             }
-            catch
+            catch (Exception ex)
             {
+                // Log the actual error for debugging
+                _logger.LogError(ex, "Error generating PDF receipt for donation {DonationId}", id);
                 TempData["ErrorMessage"] = "Failed to generate receipt. Please try again later.";
-                return RedirectToAction("Success", new { id = donation.Id });
+                return RedirectToAction("MyDonations");
             }
         }
 
@@ -478,6 +503,7 @@ namespace NGODonationSystem.Controllers
 
             // Get donation with all necessary relationships
             var donation = await _context.Donations
+                .Include(d => d.Donor)
                 .Include(d => d.Campaign)
                 .Include(d => d.NGO)
                 .Include(d => d.Payment)
