@@ -3,59 +3,164 @@
     ViewData["Title"] = "Donor Registration";
 }
 
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white">
-                    <h3 class="mb-0">Donor Registration</h3>
-                </div>
-                <div class="card-body">
-                    <form asp-action="RegisterDonor" method="post">
-                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+<style>
+    .auth-container {
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 0;
+    }
+    
+    .auth-card {
+        background: #ffffff;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        padding: 2.5rem;
+        width: 100%;
+        max-width: 520px;
+    }
+    
+    .auth-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    .auth-brand {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #0d6efd;
+        margin-bottom: 0.5rem;
+    }
+    
+    .auth-title {
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: #212529;
+        margin-bottom: 0.5rem;
+    }
+    
+    .auth-form .form-label {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #495057;
+        margin-bottom: 0.5rem;
+    }
+    
+    .auth-form .form-control {
+        height: 44px;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        font-size: 0.9375rem;
+        padding: 0.5rem 0.75rem;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+    
+    .auth-form .form-control:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13,110,253,0.1);
+    }
+    
+    .auth-form textarea.form-control {
+        height: auto;
+    }
+    
+    .auth-submit {
+        height: 44px;
+        font-size: 1rem;
+        font-weight: 500;
+        border-radius: 6px;
+        margin-top: 1rem;
+    }
+    
+    .auth-links {
+        text-align: center;
+        margin-top: 1.5rem;
+    }
+    
+    .auth-links p {
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin-bottom: 0.5rem;
+    }
+    
+    .auth-links a {
+        color: #0d6efd;
+        text-decoration: none;
+        font-weight: 500;
+    }
+    
+    .auth-links a:hover {
+        color: #0a58ca;
+        text-decoration: underline;
+    }
+    
+    .text-danger {
+        font-size: 0.8125rem;
+        margin-top: 0.25rem;
+    }
+    
+    @@media (max-width: 576px) {
+        .auth-card {
+            padding: 1.5rem;
+        }
+        
+        .auth-title {
+            font-size: 1.5rem;
+        }
+    }
+</style>
 
-                        <div class="mb-3">
-                            <label asp-for="FullName" class="form-label"></label>
-                            <input asp-for="FullName" class="form-control" />
-                            <span asp-validation-for="FullName" class="text-danger"></span>
-                        </div>
-
-                        <div class="mb-3">
-                            <label asp-for="Email" class="form-label"></label>
-                            <input asp-for="Email" class="form-control" type="email" />
-                            <span asp-validation-for="Email" class="text-danger"></span>
-                        </div>
-
-                        <div class="mb-3">
-                            <label asp-for="PhoneNumber" class="form-label"></label>
-                            <input asp-for="PhoneNumber" class="form-control" type="tel" />
-                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
-                        </div>
-
-                        <div class="mb-3">
-                            <label asp-for="Password" class="form-label"></label>
-                            <input asp-for="Password" class="form-control" type="password" />
-                            <span asp-validation-for="Password" class="text-danger"></span>
-                        </div>
-
-                        <div class="mb-3">
-                            <label asp-for="ConfirmPassword" class="form-label"></label>
-                            <input asp-for="ConfirmPassword" class="form-control" type="password" />
-                            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-                        </div>
-
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary">Register as Donor</button>
-                        </div>
-
-                        <div class="mt-3 text-center">
-                            <p>Already have an account? <a asp-action="Login">Login here</a></p>
-                            <p>Are you an NGO? <a asp-action="RegisterNGO">Register as NGO</a></p>
-                        </div>
-                    </form>
-                </div>
-            </div>
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="auth-brand">CareFund</div>
+            <h1 class="auth-title">Donor Registration</h1>
         </div>
+
+        <form asp-action="RegisterDonor" method="post" class="auth-form">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="mb-3">
+                <label asp-for="FullName" class="form-label">Full Name <span class="text-danger">*</span></label>
+                <input asp-for="FullName" class="form-control" placeholder="Enter your full name" />
+                <span asp-validation-for="FullName" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Email" class="form-label">Email <span class="text-danger">*</span></label>
+                <input asp-for="Email" class="form-control" type="email" placeholder="Enter your email" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="PhoneNumber" class="form-label">Phone Number <span class="text-danger">*</span></label>
+                <input asp-for="PhoneNumber" class="form-control" type="tel" placeholder="Enter your phone number" />
+                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Password" class="form-label">Password <span class="text-danger">*</span></label>
+                <input asp-for="Password" class="form-control" type="password" placeholder="Create a password" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="ConfirmPassword" class="form-label">Confirm Password <span class="text-danger">*</span></label>
+                <input asp-for="ConfirmPassword" class="form-control" type="password" placeholder="Confirm your password" />
+                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+            </div>
+
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary auth-submit">Register as Donor</button>
+            </div>
+
+            <div class="auth-links">
+                <p>Already have an account? <a asp-action="Login">Login here</a></p>
+                <p>Are you an NGO? <a asp-action="RegisterNGO">Register as NGO</a></p>
+            </div>
+        </form>
     </div>
 </div>
 
