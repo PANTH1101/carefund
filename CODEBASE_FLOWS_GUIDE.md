@@ -559,69 +559,93 @@ var campaignList = await campaigns
    ```
    POST /Donation/Create
    ├── Validates CreateDonationViewModel
-   ├── Stores in TempData for review page
-   └── Redirects to /Donation/Review
+   ├── Fetches campaign and NGO details
+   ├── Creates DonationReviewViewModel
+   └── Returns View("Review", reviewModel) ← Directly renders Review page
    ```
 
 **Key Code:**
 ```csharp
 // DonationController.cs - Create POST
-TempData["DonationAmount"] = model.Amount;
-TempData["CampaignId"] = model.CampaignId;
-TempData["IsAnonymous"] = model.IsAnonymous;
-TempData["DonorComment"] = model.DonorComment;
+var campaign = await _context.Campaigns
+    .Include(c => c.NGO)
+    .ThenInclude(n => n.User)
+    .FirstOrDefaultAsync(c => c.Id == model.CampaignId);
 
-return RedirectToAction("Review");
+var reviewModel = new DonationReviewViewModel
+{
+    Campaign = campaign,
+    NGO = campaign.NGO,
+    Amount = model.Amount,
+    IsAnonymous = model.IsAnonymous,
+    DonorComment = model.DonorComment
+};
+
+return View("Review", reviewModel);
 ```
 
 ---
 
 ### 4.2 Review Donation (Step 2: Confirmation)
 
-**Entry Point:** `/Donation/Review`
+**Entry Point:** Rendered directly by `Create POST`
 
 **Files Involved:**
-- `Controllers/DonationController.cs` → `Review()` GET & POST
-- `ViewModels/ReviewDonationViewModel.cs`
+- `Controllers/DonationController.cs` → `Create()` POST (renders Review view)
+- `ViewModels/DonationReviewViewModel.cs`
 - `Views/Donation/Review.cshtml`
 
 **Flow Steps:**
 
-1. **Donor reviews donation details**
+1. **Donor reviews donation details (rendered by Create POST)**
    ```
-   GET /Donation/Review
-   ├── Reads TempData from Create step
+   POST /Donation/Create
+   ├── Validates CreateDonationViewModel
    ├── Fetches campaign and NGO details
-   ├── Displays summary:
-   │   ├── Campaign name and NGO
-   │   ├── Donation amount
-   │   ├── Anonymous status
-   │   └── Donor comment
-   └── Shows "Confirm & Pay" button
+   ├── Creates DonationReviewViewModel
+   ├── Returns View("Review", reviewModel) ← NOTE: No separate Review GET action
+   └── Displays review page with:
+       ├── Campaign name and NGO
+       ├── Donation amount
+       ├── Anonymous status
+       ├── Donor comment
+       └── "Confirm & Pay" button
    ```
 
 2. **Donor confirms and proceeds to payment**
    ```
-   POST /Donation/Review
-   ├── Creates Donation record (Status: Pending)
-   ├── Creates Payment record (Status: Pending)
+   POST /Donation/ProcessPayment
+   ├── Receives donation details from form
+   ├── Creates Donation record (Status: "Pending")
    ├── Initiates Razorpay order
-   ├── Returns Razorpay order details to frontend
-   └── Frontend opens Razorpay checkout modal
+   ├── Returns View("Checkout") with payment details
+   └── Checkout page opens Razorpay modal
    ```
 
 **Key Code:**
 ```csharp
-// DonationController.cs - Review POST
+// DonationController.cs - Create POST (renders Review)
+var reviewModel = new DonationReviewViewModel
+{
+    Campaign = campaign,
+    NGO = campaign.NGO,
+    Amount = model.Amount,
+    IsAnonymous = model.IsAnonymous,
+    DonorComment = model.DonorComment
+};
+
+return View("Review", reviewModel); // ← Renders Review.cshtml directly
+
+// DonationController.cs - ProcessPayment POST
 var donation = new Donation
 {
     CampaignId = campaignId,
-    DonorId = donorUser.Id,
+    DonorId = _userManager.GetUserId(User),
     Amount = amount,
     DonationDate = DateTime.UtcNow,
     IsAnonymous = isAnonymous,
     DonorComment = donorComment,
-    PaymentStatus = PaymentStatus.Pending
+    Status = "Pending"
 };
 
 _context.Donations.Add(donation);
@@ -630,12 +654,10 @@ await _context.SaveChangesAsync();
 // Create Razorpay order (see Payment Processing section)
 var razorpayOrder = await CreateRazorpayOrder(donation);
 
-return Json(new { 
-    success = true, 
-    orderId = razorpayOrder.Id,
-    donationId = donation.Id 
-});
+return View("Checkout", checkoutModel); // ← Renders Checkout.cshtml
 ```
+
+**Important:** There is **no separate `Review()` GET action** - the Create POST action directly renders the Review view when validation passes. This streamlined approach reduces round-trips compared to a traditional multi-action flow.
 
 ---
 
