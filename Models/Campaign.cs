@@ -20,6 +20,8 @@ namespace NGODonationSystem.Models
 
         public DateTime Deadline { get; set; }
 
+        public bool IsCancelled { get; set; } = false;
+
         public int NGOId { get; set; }
 
         public NGO NGO { get; set; } = null!;

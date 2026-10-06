@@ -5,10 +5,10 @@ using Microsoft.EntityFrameworkCore;
 using NGODonationSystem.Data;
 using NGODonationSystem.Models;
 using NGODonationSystem.ViewModels;
+using NGODonationSystem.Extensions;
 
 namespace NGODonationSystem.Controllers
 {
-    [Authorize(Roles = "NGO")]
     public class CampaignController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -29,7 +29,103 @@ namespace NGODonationSystem.Controllers
             _userManager = userManager;
         }
 
+        // GET: Campaign/Index - Public campaign discovery
+        [AllowAnonymous]
+        public async Task<IActionResult> Index(string search, string category)
+        {
+            var today = DateTime.Today;
+
+            // Start with campaigns from approved NGOs only
+            // AND campaigns that are currently active (can accept donations)
+            var query = _context.Campaigns
+                .Include(c => c.NGO)
+                .Include(c => c.Donations)
+                .Where(c => c.NGO.VerificationStatus == "Approved")
+                .Where(c => !c.IsCancelled) // Exclude cancelled campaigns
+                .Where(c => c.StartDate <= today) // Must have started
+                .Where(c => c.Deadline >= today); // Must not be expired
+
+            // Apply search filter
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                query = query.Where(c => c.Title.Contains(search));
+                ViewBag.CurrentSearch = search;
+            }
+
+            // Apply category filter
+            if (!string.IsNullOrWhiteSpace(category) && category != "All")
+            {
+                query = query.Where(c => c.Category == category);
+                ViewBag.CurrentCategory = category;
+            }
+
+            // Load campaigns with raised amounts
+            var campaignsWithData = await query
+                .OrderByDescending(c => c.StartDate)
+                .Select(c => new
+                {
+                    Campaign = c,
+                    RaisedAmount = c.Donations
+                        .Where(d => d.Status == "Success" || d.Status == "Completed")
+                        .Sum(d => d.Amount)
+                })
+                .ToListAsync();
+
+            // Filter out completed campaigns (target reached)
+            var activeCampaigns = campaignsWithData
+                .Where(x => x.RaisedAmount < x.Campaign.TargetAmount)
+                .Select(x => x.Campaign)
+                .ToList();
+
+            ViewBag.Categories = _validCategories;
+            return View(activeCampaigns);
+        }
+
+        // GET: Campaign/Details/5 - Public campaign details
+        [AllowAnonymous]
+        public async Task<IActionResult> Details(int id)
+        {
+            // Security check: Only show campaigns from approved NGOs
+            var campaign = await _context.Campaigns
+                .Include(c => c.NGO)
+                .Include(c => c.Donations)
+                .FirstOrDefaultAsync(c => c.Id == id && c.NGO.VerificationStatus == "Approved");
+
+            if (campaign == null)
+            {
+                return NotFound();
+            }
+
+            // Calculate raised amount from successful donations
+            decimal raisedAmount = campaign.Donations
+                .Where(d => d.Status == "Success" || d.Status == "Completed")
+                .Sum(d => d.Amount);
+
+            ViewBag.RaisedAmount = raisedAmount;
+            ViewBag.Progress = campaign.TargetAmount > 0
+                ? Math.Min((raisedAmount / campaign.TargetAmount) * 100, 100)
+                : 0;
+            ViewBag.DonorCount = campaign.Donations
+                .Where(d => d.Status == "Success" || d.Status == "Completed")
+                .Select(d => d.DonorId)
+                .Distinct()
+                .Count();
+
+            // Calculate status using centralized extension method
+            ViewBag.Status = campaign.GetStatus(raisedAmount);
+            
+            // Calculate days remaining
+            var today = DateTime.Today;
+            if (campaign.Deadline >= today && raisedAmount < campaign.TargetAmount)
+            {
+                ViewBag.DaysRemaining = (campaign.Deadline - today).Days;
+            }
+
+            return View(campaign);
+        }
+
         // GET: Campaign/MyCampaigns
+        [Authorize(Roles = "NGO")]
         public async Task<IActionResult> MyCampaigns()
         {
             var ngo = await GetLoggedInNGOAsync();
@@ -48,6 +144,7 @@ namespace NGODonationSystem.Controllers
         }
 
         // GET: Campaign/Create
+        [Authorize(Roles = "NGO")]
         public async Task<IActionResult> Create()
         {
             var ngo = await GetLoggedInNGOAsync();
@@ -64,10 +161,11 @@ namespace NGODonationSystem.Controllers
             }
 
             ViewBag.Categories = _validCategories;
-            return View();
+            return View(new CreateCampaignViewModel());
         }
 
         // POST: Campaign/Create
+        [Authorize(Roles = "NGO")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CreateCampaignViewModel model)
@@ -145,47 +243,8 @@ namespace NGODonationSystem.Controllers
             return View(model);
         }
 
-        // GET: Campaign/Details/5
-        public async Task<IActionResult> Details(int id)
-        {
-            var ngo = await GetLoggedInNGOAsync();
-            if (ngo == null)
-            {
-                return NotFound("NGO profile not found.");
-            }
-
-            var campaign = await _context.Campaigns
-                .Include(c => c.NGO)
-                .Include(c => c.Donations)
-                .FirstOrDefaultAsync(c => c.Id == id && c.NGOId == ngo.Id);
-
-            if (campaign == null)
-            {
-                return NotFound();
-            }
-
-            // Calculate raised amount from successful donations
-            decimal raisedAmount = campaign.Donations
-                .Where(d => d.Status == "Success" || d.Status == "Completed")
-                .Sum(d => d.Amount);
-
-            ViewBag.RaisedAmount = raisedAmount;
-            ViewBag.Progress = campaign.TargetAmount > 0
-                ? Math.Min((raisedAmount / campaign.TargetAmount) * 100, 100)
-                : 0;
-            ViewBag.DonorCount = campaign.Donations
-                .Where(d => d.Status == "Success" || d.Status == "Completed")
-                .Select(d => d.DonorId)
-                .Distinct()
-                .Count();
-
-            // Calculate status
-            ViewBag.Status = GetCampaignStatus(campaign, raisedAmount);
-
-            return View(campaign);
-        }
-
         // GET: Campaign/Edit/5
+        [Authorize(Roles = "NGO")]
         public async Task<IActionResult> Edit(int id)
         {
             var ngo = await GetLoggedInNGOAsync();
@@ -195,11 +254,19 @@ namespace NGODonationSystem.Controllers
             }
 
             var campaign = await _context.Campaigns
+                .Include(c => c.Donations) // Include donations to check edit eligibility
                 .FirstOrDefaultAsync(c => c.Id == id && c.NGOId == ngo.Id);
 
             if (campaign == null)
             {
                 return NotFound();
+            }
+
+            // BUSINESS RULE: Cannot edit campaign if it has ANY donations
+            if (campaign.Donations.Any())
+            {
+                TempData["ErrorMessage"] = "Cannot edit campaign that has received donations. This protects donor trust and prevents fraud.";
+                return RedirectToAction(nameof(Details), new { id = campaign.Id });
             }
 
             var model = new EditCampaignViewModel
@@ -220,6 +287,7 @@ namespace NGODonationSystem.Controllers
         }
 
         // POST: Campaign/Edit/5
+        [Authorize(Roles = "NGO")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(EditCampaignViewModel model)
@@ -231,11 +299,19 @@ namespace NGODonationSystem.Controllers
             }
 
             var campaign = await _context.Campaigns
+                .Include(c => c.Donations) // Include donations to check edit eligibility
                 .FirstOrDefaultAsync(c => c.Id == model.Id && c.NGOId == ngo.Id);
 
             if (campaign == null)
             {
                 return NotFound();
+            }
+
+            // SECURITY: Re-check edit eligibility server-side (don't trust browser)
+            if (campaign.Donations.Any())
+            {
+                TempData["ErrorMessage"] = "Cannot edit campaign that has received donations.";
+                return RedirectToAction(nameof(Details), new { id = campaign.Id });
             }
 
             // Validate category
@@ -296,6 +372,7 @@ namespace NGODonationSystem.Controllers
         }
 
         // POST: Campaign/Delete/5
+        [Authorize(Roles = "NGO")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
@@ -330,6 +407,7 @@ namespace NGODonationSystem.Controllers
         }
 
         // POST: Campaign/Cancel/5
+        [Authorize(Roles = "NGO")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Cancel(int id)
@@ -348,11 +426,18 @@ namespace NGODonationSystem.Controllers
                 return NotFound();
             }
 
-            // Cancel by setting deadline to yesterday
-            campaign.Deadline = DateTime.Today.AddDays(-1);
+            // Check if already cancelled
+            if (campaign.IsCancelled)
+            {
+                TempData["ErrorMessage"] = "Campaign is already cancelled.";
+                return RedirectToAction(nameof(Details), new { id = campaign.Id });
+            }
+
+            // Mark campaign as cancelled (permanent action)
+            campaign.IsCancelled = true;
             await _context.SaveChangesAsync();
 
-            TempData["SuccessMessage"] = "Campaign has been canceled.";
+            TempData["SuccessMessage"] = "Campaign has been cancelled. This action is permanent.";
             return RedirectToAction(nameof(Details), new { id = campaign.Id });
         }
 
@@ -374,33 +459,6 @@ namespace NGODonationSystem.Controllers
             var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
             var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
             return allowedExtensions.Contains(extension);
-        }
-
-        // Helper method to determine campaign status
-        private string GetCampaignStatus(Campaign campaign, decimal raisedAmount)
-        {
-            var today = DateTime.Today;
-
-            // Check if completed (target reached)
-            if (raisedAmount >= campaign.TargetAmount)
-            {
-                return "Completed";
-            }
-
-            // Check if expired (deadline passed)
-            if (campaign.Deadline < today)
-            {
-                return "Expired";
-            }
-
-            // Check if active (between start and deadline)
-            if (campaign.StartDate <= today && campaign.Deadline >= today)
-            {
-                return "Active";
-            }
-
-            // Not yet started
-            return "Scheduled";
         }
     }
 }

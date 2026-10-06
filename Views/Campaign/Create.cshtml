@@ -3,78 +3,343 @@
     ViewData["Title"] = "Create Campaign";
 }
 
-<div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h3>Create New Campaign</h3>
+<style>
+    .create-campaign-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+    
+    .page-header {
+        margin-bottom: 2rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .page-title {
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin: 0;
+    }
+    
+    .create-card {
+        background: #ffffff;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    
+    .form-section {
+        padding: 2rem;
+        border-bottom: 1px solid #f1f3f5;
+    }
+    
+    .form-section:last-child {
+        border-bottom: none;
+    }
+    
+    .section-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 1.25rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #3b82f6;
+        display: inline-block;
+    }
+    
+    .form-group {
+        margin-bottom: 1.25rem;
+    }
+    
+    .form-label {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #495057;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+    
+    .required {
+        color: #dc3545;
+        margin-left: 0.25rem;
+    }
+    
+    .optional-label {
+        font-size: 0.8125rem;
+        color: #6c757d;
+        margin-left: 0.25rem;
+        font-weight: 400;
+    }
+    
+    .form-control,
+    .form-select {
+        width: 100%;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        font-size: 0.9375rem;
+        padding: 0.625rem 0.875rem;
+    }
+    
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #3b82f6;
+        outline: none;
+        box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.1);
+    }
+    
+    input.form-control {
+        height: 44px;
+    }
+    
+    textarea.form-control {
+        min-height: 120px;
+        resize: vertical;
+    }
+    
+    select.form-select {
+        height: 44px;
+    }
+    
+    .text-danger {
+        color: #dc3545;
+        font-size: 0.8125rem;
+        margin-top: 0.25rem;
+        display: block;
+    }
+    
+    .validation-summary {
+        padding: 1rem;
+        background: #f8d7da;
+        border: 1px solid #f5c2c7;
+        border-radius: 6px;
+        margin-bottom: 1.5rem;
+        color: #842029;
+    }
+    
+    .row {
+        display: flex;
+        flex-wrap: wrap;
+        margin-left: -0.75rem;
+        margin-right: -0.75rem;
+    }
+    
+    .col-md-6 {
+        flex: 0 0 50%;
+        max-width: 50%;
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+    }
+    
+    .action-section {
+        background: #f8f9fa;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 0.75rem;
+    }
+    
+    .btn {
+        padding: 0.625rem 1.5rem;
+        font-size: 0.9375rem;
+        font-weight: 500;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+    }
+    
+    .btn-primary {
+        background: #3b82f6;
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        background: #2563eb;
+        color: white;
+    }
+    
+    .btn-secondary {
+        background: white;
+        color: #6c757d;
+        border: 1px solid #dee2e6;
+    }
+    
+    .btn-secondary:hover {
+        background: #f8f9fa;
+        color: #495057;
+        text-decoration: none;
+    }
+    
+    @@media (max-width: 768px) {
+        .create-campaign-container {
+            padding: 1rem;
+        }
+        
+        .form-section {
+            padding: 1.25rem;
+        }
+        
+        .col-md-6 {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+        
+        .action-buttons {
+            flex-direction: column;
+        }
+        
+        .btn {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="create-campaign-container">
+    <div class="page-header">
+        <h1 class="page-title">Create New Campaign</h1>
+    </div>
+
+    <div class="create-card">
+        <form method="post" enctype="multipart/form-data" action="@Url.Action("Create", "Campaign")">
+            @Html.AntiForgeryToken()
+            
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="form-section">
+                    <div class="validation-summary">
+                        <strong>Please correct the following errors:</strong>
+                        <ul style="margin: 0.5rem 0 0 1.25rem;">
+                            @foreach (var state in ViewData.ModelState.Values)
+                            {
+                                foreach (var error in state.Errors)
+                                {
+                                    <li>@error.ErrorMessage</li>
+                                }
+                            }
+                        </ul>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <form asp-action="Create" method="post" enctype="multipart/form-data">
-                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+            }
 
-                        <div class="mb-3">
-                            <label asp-for="Title" class="form-label"></label>
-                            <input asp-for="Title" class="form-control" />
-                            <span asp-validation-for="Title" class="text-danger"></span>
-                        </div>
-
-                        <div class="mb-3">
-                            <label asp-for="Description" class="form-label"></label>
-                            <textarea asp-for="Description" class="form-control" rows="6"></textarea>
-                            <span asp-validation-for="Description" class="text-danger"></span>
-                        </div>
-
-                        <div class="mb-3">
-                            <label asp-for="Category" class="form-label"></label>
-                            <select asp-for="Category" class="form-select">
-                                <option value="">-- Select Category --</option>
-                                <option value="Medical">Medical</option>
-                                <option value="Education">Education</option>
-                                <option value="Food">Food</option>
-                                <option value="Disaster Relief">Disaster Relief</option>
-                                <option value="Children">Children</option>
-                                <option value="Elderly">Elderly</option>
-                                <option value="Animals">Animals</option>
-                                <option value="Other">Other</option>
-                            </select>
-                            <span asp-validation-for="Category" class="text-danger"></span>
-                        </div>
-
-                        <div class="mb-3">
-                            <label asp-for="Image" class="form-label"></label>
-                            <input asp-for="Image" type="file" class="form-control" accept="image/jpeg,image/jpg,image/png,image/gif" />
-                            <span asp-validation-for="Image" class="text-danger"></span>
-                        </div>
-
-                        <div class="mb-3">
-                            <label asp-for="TargetAmount" class="form-label"></label>
-                            <input asp-for="TargetAmount" type="number" class="form-control" min="1" step="0.01" />
-                            <span asp-validation-for="TargetAmount" class="text-danger"></span>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="StartDate" class="form-label"></label>
-                                <input asp-for="StartDate" type="date" class="form-control" />
-                                <span asp-validation-for="StartDate" class="text-danger"></span>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="Deadline" class="form-label"></label>
-                                <input asp-for="Deadline" type="date" class="form-control" />
-                                <span asp-validation-for="Deadline" class="text-danger"></span>
-                            </div>
-                        </div>
-
-                        <div class="d-flex gap-2">
-                            <button type="submit" class="btn btn-primary">Create Campaign</button>
-                            <a asp-action="MyCampaigns" class="btn btn-secondary">Cancel</a>
-                        </div>
-                    </form>
+            <!-- Campaign Information -->
+            <div class="form-section">
+                <h2 class="section-title">Campaign Information</h2>
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        Campaign Title<span class="required">*</span>
+                    </label>
+                    <input type="text" 
+                           name="Title" 
+                           value="@(Model?.Title ?? "")" 
+                           class="form-control" 
+                           required />
+                    <span class="text-danger">@Html.ValidationMessage("Title")</span>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        Campaign Description<span class="required">*</span>
+                    </label>
+                    <textarea name="Description" 
+                              class="form-control" 
+                              rows="6" 
+                              required>@(Model?.Description ?? "")</textarea>
+                    <span class="text-danger">@Html.ValidationMessage("Description")</span>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        Category<span class="required">*</span>
+                    </label>
+                    <select name="Category" class="form-select" required>
+                        <option value="">-- Select Category --</option>
+                        <option value="Medical" selected="@(Model?.Category == "Medical")">Medical</option>
+                        <option value="Education" selected="@(Model?.Category == "Education")">Education</option>
+                        <option value="Food" selected="@(Model?.Category == "Food")">Food</option>
+                        <option value="Disaster Relief" selected="@(Model?.Category == "Disaster Relief")">Disaster Relief</option>
+                        <option value="Children" selected="@(Model?.Category == "Children")">Children</option>
+                        <option value="Elderly" selected="@(Model?.Category == "Elderly")">Elderly</option>
+                        <option value="Animals" selected="@(Model?.Category == "Animals")">Animals</option>
+                        <option value="Other" selected="@(Model?.Category == "Other")">Other</option>
+                    </select>
+                    <span class="text-danger">@Html.ValidationMessage("Category")</span>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        Campaign Image<span class="optional-label">(Optional)</span>
+                    </label>
+                    <input type="file" 
+                           name="Image" 
+                           class="form-control" 
+                           accept="image/jpeg,image/jpg,image/png,image/gif" />
+                    <span class="text-danger">@Html.ValidationMessage("Image")</span>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        Target Amount (₹)<span class="required">*</span>
+                    </label>
+                    <input type="number" 
+                           name="TargetAmount" 
+                           value="@(Model?.TargetAmount ?? 0)" 
+                           class="form-control" 
+                           min="1" 
+                           step="0.01" 
+                           required />
+                    <span class="text-danger">@Html.ValidationMessage("TargetAmount")</span>
                 </div>
             </div>
-        </div>
+
+            <!-- Campaign Timeline -->
+            <div class="form-section">
+                <h2 class="section-title">Campaign Timeline</h2>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-label">
+                                Start Date<span class="required">*</span>
+                            </label>
+                            <input type="date" 
+                                   name="StartDate" 
+                                   value="@((Model?.StartDate ?? DateTime.Today).ToString("yyyy-MM-dd"))" 
+                                   class="form-control" 
+                                   required />
+                            <span class="text-danger">@Html.ValidationMessage("StartDate")</span>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-label">
+                                Deadline<span class="required">*</span>
+                            </label>
+                            <input type="date" 
+                                   name="Deadline" 
+                                   value="@((Model?.Deadline ?? DateTime.Today.AddDays(30)).ToString("yyyy-MM-dd"))" 
+                                   class="form-control" 
+                                   required />
+                            <span class="text-danger">@Html.ValidationMessage("Deadline")</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="form-section action-section">
+                <div class="action-buttons">
+                    <button type="submit" class="btn btn-primary">Create Campaign</button>
+                    <a href="@Url.Action("MyCampaigns", "Campaign")" class="btn btn-secondary">Cancel</a>
+                </div>
+            </div>
+        </form>
     </div>
 </div>
 
