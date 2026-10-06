@@ -5,112 +5,239 @@
     var ngo = ViewBag.NGO as NGODonationSystem.Models.NGO;
 }
 
-<div class="container mt-5">
-    <div class="row">
-        <div class="col-md-8 offset-md-2">
-            @if (TempData["SuccessMessage"] != null)
-            {
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    @TempData["SuccessMessage"]
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+<style>
+    .page-header {
+        margin-bottom: 2rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .page-title {
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: #212529;
+        margin-bottom: 0.25rem;
+    }
+    
+    .profile-card {
+        background: #ffffff;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    
+    .profile-section {
+        padding: 2rem;
+    }
+    
+    .section-divider {
+        height: 1px;
+        background: #e9ecef;
+        margin: 0;
+    }
+    
+    .section-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #212529;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #0d6efd;
+        display: inline-block;
+    }
+    
+    .profile-row {
+        display: flex;
+        margin-bottom: 1.5rem;
+    }
+    
+    .profile-row:last-child {
+        margin-bottom: 0;
+    }
+    
+    .profile-label {
+        font-size: 0.8125rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #6c757d;
+        font-weight: 500;
+        min-width: 180px;
+        padding-top: 0.25rem;
+    }
+    
+    .profile-value {
+        font-size: 1rem;
+        color: #212529;
+        flex: 1;
+    }
+    
+    .badge-role {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+        font-weight: 500;
+    }
+    
+    .ngo-logo {
+        max-width: 200px;
+        max-height: 200px;
+        border: 1px solid #e9ecef;
+        border-radius: 6px;
+        padding: 0.5rem;
+        background: #ffffff;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 2rem;
+    }
+    
+    @@media (max-width: 768px) {
+        .profile-row {
+            flex-direction: column;
+        }
+        
+        .profile-label {
+            margin-bottom: 0.5rem;
+            min-width: auto;
+        }
+        
+        .profile-section {
+            padding: 1.25rem;
+        }
+        
+        .action-buttons {
+            flex-direction: column;
+        }
+    }
+</style>
+
+<div class="container" style="max-width: 900px;">
+    <!-- Success Message -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert" style="border: 1px solid #badbcc; background: #d1e7dd;">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1 class="page-title">My Profile</h1>
+    </div>
+
+    <div class="profile-card">
+        <!-- Basic Information -->
+        <div class="profile-section">
+            <h2 class="section-title">Basic Information</h2>
+            
+            <div class="profile-row">
+                <div class="profile-label">Full Name</div>
+                <div class="profile-value">@Model.FullName</div>
+            </div>
+
+            <div class="profile-row">
+                <div class="profile-label">Email</div>
+                <div class="profile-value">@Model.Email</div>
+            </div>
+
+            <div class="profile-row">
+                <div class="profile-label">Phone Number</div>
+                <div class="profile-value">@(Model.PhoneNumber ?? "Not provided")</div>
+            </div>
+
+            <div class="profile-row">
+                <div class="profile-label">Role</div>
+                <div class="profile-value">
+                    <span class="badge badge-role @(role == "Admin" ? "bg-danger" : role == "NGO" ? "bg-success" : "bg-primary")">
+                        @role
+                    </span>
                 </div>
-            }
+            </div>
+        </div>
 
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white">
-                    <h3 class="mb-0">My Profile</h3>
+        @if (role == "NGO" && ngo != null)
+        {
+            <div class="section-divider"></div>
+            
+            <!-- NGO Information -->
+            <div class="profile-section">
+                <h2 class="section-title">NGO Information</h2>
+
+                <div class="profile-row">
+                    <div class="profile-label">NGO Name</div>
+                    <div class="profile-value">@ngo.Name</div>
                 </div>
-                <div class="card-body">
-                    <div class="row mb-3">
-                        <div class="col-md-4 fw-bold">Full Name:</div>
-                        <div class="col-md-8">@Model.FullName</div>
-                    </div>
 
-                    <div class="row mb-3">
-                        <div class="col-md-4 fw-bold">Email:</div>
-                        <div class="col-md-8">@Model.Email</div>
-                    </div>
+                <div class="profile-row">
+                    <div class="profile-label">Description</div>
+                    <div class="profile-value">@ngo.Description</div>
+                </div>
 
-                    <div class="row mb-3">
-                        <div class="col-md-4 fw-bold">Phone Number:</div>
-                        <div class="col-md-8">@(Model.PhoneNumber ?? "Not provided")</div>
-                    </div>
+                <div class="profile-row">
+                    <div class="profile-label">Address</div>
+                    <div class="profile-value">@ngo.Address</div>
+                </div>
 
-                    <div class="row mb-3">
-                        <div class="col-md-4 fw-bold">Role:</div>
-                        <div class="col-md-8">
-                            <span class="badge @(role == "Admin" ? "bg-danger" : role == "NGO" ? "bg-success" : "bg-primary")">
-                                @role
-                            </span>
+                <div class="profile-row">
+                    <div class="profile-label">City</div>
+                    <div class="profile-value">@ngo.City</div>
+                </div>
+
+                <div class="profile-row">
+                    <div class="profile-label">State</div>
+                    <div class="profile-value">@ngo.State</div>
+                </div>
+
+                <div class="profile-row">
+                    <div class="profile-label">Pincode</div>
+                    <div class="profile-value">@ngo.Pincode</div>
+                </div>
+
+                @if (!string.IsNullOrWhiteSpace(ngo.Website))
+                {
+                    <div class="profile-row">
+                        <div class="profile-label">Website</div>
+                        <div class="profile-value">
+                            <a href="@ngo.Website" target="_blank" rel="noopener noreferrer">@ngo.Website</a>
                         </div>
                     </div>
+                }
 
-                    @if (role == "NGO" && ngo != null)
-                    {
-                        <hr class="my-4" />
-                        <h5 class="text-success mb-3">NGO Information</h5>
-
-                        <div class="row mb-3">
-                            <div class="col-md-4 fw-bold">NGO Name:</div>
-                            <div class="col-md-8">@ngo.Name</div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-md-4 fw-bold">Description:</div>
-                            <div class="col-md-8">@ngo.Description</div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-md-4 fw-bold">Contact Information:</div>
-                            <div class="col-md-8">
-                                <pre class="mb-0">@ngo.ContactInformation</pre>
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-md-4 fw-bold">Verification Status:</div>
-                            <div class="col-md-8">
-                                <span class="badge @(ngo.VerificationStatus == "Approved" ? "bg-success" : ngo.VerificationStatus == "Rejected" ? "bg-danger" : "bg-warning text-dark")">
-                                    @ngo.VerificationStatus
-                                </span>
-                            </div>
-                        </div>
-
-                        @if (ngo.VerificationStatus == "Rejected")
-                        {
-                            <div class="alert alert-warning mt-3">
-                                <h6 class="alert-heading"><i class="bi bi-exclamation-triangle"></i> Verification Rejected</h6>
-                                <p class="mb-0">
-                                    Your NGO verification was rejected. You can 
-                                    <a asp-action="Edit" class="alert-link">edit your profile</a> 
-                                    to update your information and upload corrected verification documents for resubmission.
-                                </p>
-                            </div>
-                        }
-
-                        @if (ngo.Logo != null)
-                        {
-                            <div class="row mb-3">
-                                <div class="col-md-4 fw-bold">Logo:</div>
-                                <div class="col-md-8">
-                                    <img src="data:@ngo.LogoContentType;base64,@Convert.ToBase64String(ngo.Logo)" 
-                                         alt="NGO Logo" 
-                                         class="img-thumbnail" 
-                                         style="max-width: 200px; max-height: 200px;" />
-                                </div>
-                            </div>
-                        }
-                    }
-
-                    <div class="mt-4">
-                        <a asp-action="Edit" class="btn btn-primary">
-                            <i class="bi bi-pencil"></i> Edit Profile
-                        </a>
-                        <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">
-                            <i class="bi bi-house"></i> Back to Home
-                        </a>
+                <div class="profile-row">
+                    <div class="profile-label">Verification Status</div>
+                    <div class="profile-value">
+                        <span class="badge badge-role @(ngo.VerificationStatus == "Approved" ? "bg-success" : ngo.VerificationStatus == "Rejected" ? "bg-danger" : "bg-warning text-dark")">
+                            @ngo.VerificationStatus
+                        </span>
                     </div>
                 </div>
+
+                @if (ngo.Logo != null)
+                {
+                    <div class="profile-row">
+                        <div class="profile-label">Logo</div>
+                        <div class="profile-value">
+                            <img src="data:@ngo.LogoContentType;base64,@Convert.ToBase64String(ngo.Logo)" 
+                                 alt="NGO Logo" 
+                                 class="ngo-logo" />
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+
+        <!-- Actions -->
+        <div class="profile-section" style="background: #f8f9fa; border-top: 1px solid #e9ecef;">
+            <div class="action-buttons">
+                <a asp-action="Edit" class="btn btn-primary">
+                    <i class="bi bi-pencil"></i> Edit Profile
+                </a>
+                <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="bi bi-house"></i> Back to Home
+                </a>
             </div>
         </div>
     </div>

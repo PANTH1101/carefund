@@ -71,23 +71,17 @@ namespace NGODonationSystem.Controllers
             if (isNGO)
             {
                 var ngo = await _context.NGOs
-                    .Include(n => n.Documents)
                     .FirstOrDefaultAsync(n => n.UserId == user.Id);
 
                 if (ngo != null)
                 {
                     model.NGOName = ngo.Name;
                     model.Description = ngo.Description;
-                    model.ContactInformation = ngo.ContactInformation;
-                    model.VerificationStatus = ngo.VerificationStatus;
-
-                    // Load existing documents
-                    model.ExistingDocuments = ngo.Documents.Select(d => new NGODocumentInfo
-                    {
-                        Id = d.Id,
-                        FileName = d.FileName,
-                        ContentType = d.ContentType
-                    }).ToList();
+                    model.Address = ngo.Address;
+                    model.City = ngo.City;
+                    model.State = ngo.State;
+                    model.Pincode = ngo.Pincode;
+                    model.Website = ngo.Website;
                 }
             }
 
@@ -119,14 +113,17 @@ namespace NGODonationSystem.Controllers
                     if (model.IsNGO)
                     {
                         var ngo = await _context.NGOs
-                            .Include(n => n.Documents)
                             .FirstOrDefaultAsync(n => n.UserId == user.Id);
 
                         if (ngo != null)
                         {
                             ngo.Name = model.NGOName ?? ngo.Name;
                             ngo.Description = model.Description ?? ngo.Description;
-                            ngo.ContactInformation = model.ContactInformation ?? ngo.ContactInformation;
+                            ngo.Address = model.Address ?? ngo.Address;
+                            ngo.City = model.City ?? ngo.City;
+                            ngo.State = model.State ?? ngo.State;
+                            ngo.Pincode = model.Pincode ?? ngo.Pincode;
+                            ngo.Website = string.IsNullOrWhiteSpace(model.Website) ? null : model.Website;
 
                             // Handle logo upload
                             if (model.Logo != null)
@@ -155,62 +152,11 @@ namespace NGODonationSystem.Controllers
                                 }
                             }
 
-                            // Handle verification document resubmission (only for rejected NGOs)
-                            bool documentsUploaded = false;
-                            if (ngo.VerificationStatus == "Rejected" && model.VerificationDocuments != null && model.VerificationDocuments.Any())
-                            {
-                                // Validate all documents before processing
-                                foreach (var file in model.VerificationDocuments)
-                                {
-                                    if (!IsValidVerificationDocument(file))
-                                    {
-                                        ModelState.AddModelError("VerificationDocuments", 
-                                            $"Invalid file: {file.FileName}. Only PDF, DOC, DOCX, JPG, JPEG, PNG files are allowed.");
-                                        return View(model);
-                                    }
-
-                                    if (file.Length > 10 * 1024 * 1024) // 10MB
-                                    {
-                                        ModelState.AddModelError("VerificationDocuments", 
-                                            $"File {file.FileName} exceeds 10MB limit.");
-                                        return View(model);
-                                    }
-                                }
-
-                                // All documents valid, add them
-                                foreach (var file in model.VerificationDocuments)
-                                {
-                                    using (var memoryStream = new MemoryStream())
-                                    {
-                                        await file.CopyToAsync(memoryStream);
-                                        
-                                        var document = new NGODocument
-                                        {
-                                            FileName = file.FileName,
-                                            ContentType = file.ContentType,
-                                            FileData = memoryStream.ToArray(),
-                                            NGOId = ngo.Id
-                                        };
-
-                                        _context.NGODocuments.Add(document);
-                                    }
-                                }
-
-                                documentsUploaded = true;
-                            }
-
-                            // Change status from Rejected to Pending if new documents uploaded
-                            if (ngo.VerificationStatus == "Rejected" && documentsUploaded)
-                            {
-                                ngo.VerificationStatus = "Pending";
-                                TempData["SuccessMessage"] = "Profile updated and verification documents resubmitted successfully! Your verification status has been changed to Pending.";
-                            }
-                            else
-                            {
-                                TempData["SuccessMessage"] = "Profile updated successfully!";
-                            }
+                            // NOTE: VerificationStatus is NEVER changed by profile edits
+                            // Status transitions are controlled only by admin actions
 
                             await _context.SaveChangesAsync();
+                            TempData["SuccessMessage"] = "Profile updated successfully!";
                         }
                     }
                     else
@@ -228,14 +174,6 @@ namespace NGODonationSystem.Controllers
             }
 
             return View(model);
-        }
-
-        // Helper method to validate verification documents
-        private bool IsValidVerificationDocument(IFormFile file)
-        {
-            var allowedExtensions = new[] { ".pdf", ".doc", ".docx", ".jpg", ".jpeg", ".png" };
-            var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
-            return allowedExtensions.Contains(extension);
         }
 
         // Helper method to validate image files

@@ -75,6 +75,13 @@ namespace NGODonationSystem.Controllers
                 return NotFound();
             }
 
+            // ENFORCE: Only Pending NGOs can be approved
+            if (ngo.VerificationStatus != "Pending")
+            {
+                TempData["ErrorMessage"] = $"Cannot approve NGO '{ngo.Name}'. Only NGOs with Pending status can be approved. Current status: {ngo.VerificationStatus}";
+                return RedirectToAction(nameof(NGODetails), new { id = id });
+            }
+
             ngo.VerificationStatus = "Approved";
             await _context.SaveChangesAsync();
 
@@ -93,6 +100,13 @@ namespace NGODonationSystem.Controllers
             if (ngo == null)
             {
                 return NotFound();
+            }
+
+            // ENFORCE: Only Pending NGOs can be rejected
+            if (ngo.VerificationStatus != "Pending")
+            {
+                TempData["ErrorMessage"] = $"Cannot reject NGO '{ngo.Name}'. Only NGOs with Pending status can be rejected. Current status: {ngo.VerificationStatus}";
+                return RedirectToAction(nameof(NGODetails), new { id = id });
             }
 
             ngo.VerificationStatus = "Rejected";

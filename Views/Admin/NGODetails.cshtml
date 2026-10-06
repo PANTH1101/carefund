@@ -142,6 +142,14 @@
                     <h5 class="mb-0">Verification Actions</h5>
                 </div>
                 <div class="card-body">
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            @TempData["ErrorMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+
                     @if (Model.VerificationStatus == "Pending")
                     {
                         <p class="text-muted mb-3">This NGO is awaiting verification. Review the information and documents, then approve or reject.</p>
@@ -155,40 +163,34 @@
 
                         <form asp-action="RejectNGO" asp-route-id="@Model.Id" method="post">
                             @Html.AntiForgeryToken()
-                            <button type="submit" class="btn btn-danger w-100" onclick="return confirm('Are you sure you want to REJECT this NGO?');">
+                            <button type="submit" class="btn btn-danger w-100" onclick="return confirm('Are you sure you want to REJECT this NGO? This action is PERMANENT and cannot be reversed.');">
                                 <i class="bi bi-x-circle"></i> Reject NGO
                             </button>
                         </form>
                     }
                     else if (Model.VerificationStatus == "Approved")
                     {
-                        <div class="alert alert-success">
-                            <i class="bi bi-check-circle-fill"></i> This NGO has been <strong>approved</strong>.
+                        <div class="alert alert-success mb-0">
+                            <i class="bi bi-check-circle-fill"></i> 
+                            <strong>This NGO has been APPROVED.</strong>
+                            <hr />
+                            <p class="mb-0 small">
+                                Verification status is permanent and cannot be changed. 
+                                The NGO can now create campaigns and receive donations.
+                            </p>
                         </div>
-
-                        <p class="text-muted mb-3">You can still change the status if needed.</p>
-
-                        <form asp-action="RejectNGO" asp-route-id="@Model.Id" method="post">
-                            @Html.AntiForgeryToken()
-                            <button type="submit" class="btn btn-danger w-100" onclick="return confirm('Are you sure you want to REJECT this approved NGO?');">
-                                <i class="bi bi-x-circle"></i> Reject NGO
-                            </button>
-                        </form>
                     }
                     else if (Model.VerificationStatus == "Rejected")
                     {
-                        <div class="alert alert-danger">
-                            <i class="bi bi-x-circle-fill"></i> This NGO has been <strong>rejected</strong>.
+                        <div class="alert alert-danger mb-0">
+                            <i class="bi bi-x-circle-fill"></i> 
+                            <strong>This NGO has been REJECTED.</strong>
+                            <hr />
+                            <p class="mb-0 small">
+                                Verification status is permanent and cannot be changed. 
+                                The NGO cannot create campaigns or receive donations.
+                            </p>
                         </div>
-
-                        <p class="text-muted mb-3">You can still approve this NGO if needed.</p>
-
-                        <form asp-action="ApproveNGO" asp-route-id="@Model.Id" method="post">
-                            @Html.AntiForgeryToken()
-                            <button type="submit" class="btn btn-success w-100" onclick="return confirm('Are you sure you want to APPROVE this rejected NGO?');">
-                                <i class="bi bi-check-circle"></i> Approve NGO
-                            </button>
-                        </form>
                     }
                 </div>
             </div>

@@ -3,136 +3,378 @@
     ViewData["Title"] = "Edit Profile";
 }
 
-<div class="container mt-5">
-    <div class="row">
-        <div class="col-md-8 offset-md-2">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white">
-                    <h3 class="mb-0">Edit Profile</h3>
-                </div>
-                <div class="card-body">
-                    <form asp-action="Edit" method="post" enctype="multipart/form-data">
-                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-                        <input type="hidden" asp-for="IsNGO" />
+<style>
+    .edit-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+    
+    .page-header {
+        margin-bottom: 2rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .page-title {
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin: 0;
+    }
+    
+    .edit-card {
+        background: #ffffff;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    
+    .edit-section {
+        padding: 2rem;
+        border-bottom: 1px solid #f1f3f5;
+    }
+    
+    .edit-section:last-child {
+        border-bottom: none;
+    }
+    
+    .section-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 1.25rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #3b82f6;
+        display: inline-block;
+    }
+    
+    .form-group {
+        margin-bottom: 1.25rem;
+    }
+    
+    .form-label {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #495057;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+    
+    .required {
+        color: #dc3545;
+        margin-left: 0.25rem;
+    }
+    
+    .optional-label {
+        font-size: 0.8125rem;
+        color: #6c757d;
+        margin-left: 0.25rem;
+    }
+    
+    .form-control {
+        width: 100%;
+        height: 44px;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        font-size: 0.9375rem;
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .form-control:focus {
+        border-color: #3b82f6;
+        outline: none;
+        box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.1);
+    }
+    
+    textarea.form-control {
+        height: auto;
+        min-height: 100px;
+        resize: vertical;
+    }
+    
+    .form-text {
+        font-size: 0.8125rem;
+        color: #6c757d;
+        margin-top: 0.25rem;
+        display: block;
+    }
+    
+    .text-danger {
+        color: #dc3545;
+        font-size: 0.8125rem;
+        margin-top: 0.25rem;
+        display: block;
+    }
+    
+    .validation-summary {
+        padding: 1rem;
+        background: #f8d7da;
+        border: 1px solid #f5c2c7;
+        border-radius: 6px;
+        margin: 1rem;
+        color: #842029;
+    }
+    
+    .action-section {
+        background: #f8f9fa;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 0.75rem;
+    }
+    
+    .btn {
+        padding: 0.625rem 1.5rem;
+        font-size: 0.9375rem;
+        font-weight: 500;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+    }
+    
+    .btn-primary {
+        background: #3b82f6;
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        background: #2563eb;
+    }
+    
+    .btn-outline-secondary {
+        background: white;
+        color: #6c757d;
+        border: 1px solid #dee2e6;
+    }
+    
+    .btn-outline-secondary:hover {
+        background: #f8f9fa;
+        color: #495057;
+    }
+    
+    .row {
+        display: flex;
+        flex-wrap: wrap;
+        margin-left: -0.75rem;
+        margin-right: -0.75rem;
+    }
+    
+    .col-md-6 {
+        flex: 0 0 50%;
+        max-width: 50%;
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+    }
+    
+    @@media (max-width: 768px) {
+        .edit-container {
+            padding: 1rem;
+        }
+        
+        .edit-section {
+            padding: 1.25rem;
+        }
+        
+        .col-md-6 {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+        
+        .action-buttons {
+            flex-direction: column;
+        }
+        
+        .btn {
+            width: 100%;
+        }
+    }
+</style>
 
-                        <h5 class="mb-3 text-primary">Account Information</h5>
-                        <div class="mb-3">
-                            <label asp-for="FullName" class="form-label"></label>
-                            <input asp-for="FullName" class="form-control" />
-                            <span asp-validation-for="FullName" class="text-danger"></span>
-                        </div>
-                        <div class="mb-3">
-                            <label asp-for="PhoneNumber" class="form-label"></label>
-                            <input asp-for="PhoneNumber" class="form-control" type="tel" />
-                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
-                        </div>
+<div class="edit-container">
+    <div class="page-header">
+        <h1 class="page-title">Edit Profile</h1>
+    </div>
 
-                        @if (Model.IsNGO)
+    <div class="edit-card">
+        <form method="post" enctype="multipart/form-data" action="@Url.Action("Edit", "Profile")">
+            @Html.AntiForgeryToken()
+            
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="validation-summary">
+                    <strong>Please correct the following errors:</strong>
+                    <ul style="margin: 0.5rem 0 0 1.25rem;">
+                        @foreach (var state in ViewData.ModelState.Values)
                         {
-                            <hr class="my-4" />
-                            <h5 class="mb-3 text-primary">NGO Information</h5>
-                            
-                            <div class="mb-3">
-                                <label asp-for="NGOName" class="form-label"></label>
-                                <input asp-for="NGOName" class="form-control" />
-                                <span asp-validation-for="NGOName" class="text-danger"></span>
-                            </div>
-
-                            <div class="mb-3">
-                                <label asp-for="Description" class="form-label"></label>
-                                <textarea asp-for="Description" class="form-control" rows="4"></textarea>
-                                <span asp-validation-for="Description" class="text-danger"></span>
-                            </div>
-
-                            <div class="mb-3">
-                                <label asp-for="ContactInformation" class="form-label"></label>
-                                <textarea asp-for="ContactInformation" class="form-control" rows="3"></textarea>
-                                <span asp-validation-for="ContactInformation" class="text-danger"></span>
-                            </div>
-
-                            <div class="mb-3">
-                                <label asp-for="Logo" class="form-label"></label>
-                                <input asp-for="Logo" class="form-control" type="file" accept="image/*" />
-                                <span asp-validation-for="Logo" class="text-danger"></span>
-                                <small class="form-text text-muted">Accepted formats: JPG, JPEG, PNG, GIF. Max size: 5MB</small>
-                            </div>
-
-                            @if (!string.IsNullOrEmpty(Model.VerificationStatus))
+                            foreach (var error in state.Errors)
                             {
-                                <hr class="my-4" />
-                                <h5 class="mb-3 text-primary">Verification Status</h5>
-                                <div class="mb-3">
-                                    @if (Model.VerificationStatus == "Pending")
-                                    {
-                                        <span class="badge bg-warning text-dark fs-6">
-                                            <i class="bi bi-clock"></i> Pending Review
-                                        </span>
-                                    }
-                                    else if (Model.VerificationStatus == "Approved")
-                                    {
-                                        <span class="badge bg-success fs-6">
-                                            <i class="bi bi-check-circle"></i> Approved
-                                        </span>
-                                    }
-                                    else if (Model.VerificationStatus == "Rejected")
-                                    {
-                                        <span class="badge bg-danger fs-6">
-                                            <i class="bi bi-x-circle"></i> Rejected
-                                        </span>
-                                    }
-                                </div>
-                            }
-
-                            @if (Model.VerificationStatus == "Rejected")
-                            {
-                                <hr class="my-4" />
-                                <div class="alert alert-warning">
-                                    <h5 class="alert-heading"><i class="bi bi-exclamation-triangle"></i> Verification Resubmission</h5>
-                                    <p class="mb-0">Your NGO verification was rejected. Please update your information above and upload corrected/new verification documents below, then save to resubmit for verification.</p>
-                                </div>
-
-                                @if (Model.ExistingDocuments != null && Model.ExistingDocuments.Any())
-                                {
-                                    <div class="mb-3">
-                                        <h6 class="text-muted">Current Verification Documents:</h6>
-                                        <ul class="list-group">
-                                            @foreach (var doc in Model.ExistingDocuments)
-                                            {
-                                                <li class="list-group-item">
-                                                    <i class="bi bi-file-earmark-text"></i> @doc.FileName
-                                                    <small class="text-muted">(@doc.ContentType)</small>
-                                                </li>
-                                            }
-                                        </ul>
-                                    </div>
-                                }
-
-                                <div class="mb-3">
-                                    <label asp-for="VerificationDocuments" class="form-label fw-bold"></label>
-                                    <input asp-for="VerificationDocuments" class="form-control" type="file" multiple 
-                                           accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" />
-                                    <span asp-validation-for="VerificationDocuments" class="text-danger"></span>
-                                    <small class="form-text text-muted">
-                                        Upload corrected or new verification documents. 
-                                        Accepted formats: PDF, DOC, DOCX, JPG, JPEG, PNG. Max size per file: 10MB.
-                                        You can select multiple files.
-                                    </small>
-                                </div>
-
-                                <div class="alert alert-info">
-                                    <i class="bi bi-info-circle"></i> After uploading new documents and saving, your verification status will change to <strong>Pending</strong> and will be reviewed by an administrator.
-                                </div>
+                                <li>@error.ErrorMessage</li>
                             }
                         }
+                    </ul>
+                </div>
+            }
+            
+            <input type="hidden" name="IsNGO" value="@Model.IsNGO" />
 
-                        <div class="mt-4">
-                            <button type="submit" class="btn btn-primary">Save Changes</button>
-                            <a asp-action="Index" class="btn btn-secondary">Cancel</a>
-                        </div>
-                    </form>
+            <!-- Account Information -->
+            <div class="edit-section">
+                <h2 class="section-title">Account Information</h2>
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        Full Name<span class="required">*</span>
+                    </label>
+                    <input type="text" 
+                           name="FullName" 
+                           value="@Model.FullName" 
+                           class="form-control" 
+                           required />
+                    <span class="text-danger">@Html.ValidationMessage("FullName")</span>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        Phone Number<span class="required">*</span>
+                    </label>
+                    <input type="tel" 
+                           name="PhoneNumber" 
+                           value="@Model.PhoneNumber" 
+                           class="form-control" 
+                           required />
+                    <span class="text-danger">@Html.ValidationMessage("PhoneNumber")</span>
                 </div>
             </div>
-        </div>
+
+            @if (Model.IsNGO)
+            {
+                <!-- NGO Information -->
+                <div class="edit-section">
+                    <h2 class="section-title">NGO Information</h2>
+                    
+                    <div class="form-group">
+                        <label class="form-label">
+                            NGO Name<span class="required">*</span>
+                        </label>
+                        <input type="text" 
+                               name="NGOName" 
+                               value="@Model.NGOName" 
+                               class="form-control" 
+                               required />
+                        <span class="text-danger">@Html.ValidationMessage("NGOName")</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            Description<span class="required">*</span>
+                        </label>
+                        <textarea name="Description" 
+                                  class="form-control" 
+                                  rows="4" 
+                                  required>@Model.Description</textarea>
+                        <span class="text-danger">@Html.ValidationMessage("Description")</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            Address<span class="required">*</span>
+                        </label>
+                        <input type="text" 
+                               name="Address" 
+                               value="@Model.Address" 
+                               class="form-control" 
+                               required />
+                        <span class="text-danger">@Html.ValidationMessage("Address")</span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    City<span class="required">*</span>
+                                </label>
+                                <input type="text" 
+                                       name="City" 
+                                       value="@Model.City" 
+                                       class="form-control" 
+                                       required />
+                                <span class="text-danger">@Html.ValidationMessage("City")</span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    State<span class="required">*</span>
+                                </label>
+                                <input type="text" 
+                                       name="State" 
+                                       value="@Model.State" 
+                                       class="form-control" 
+                                       required />
+                                <span class="text-danger">@Html.ValidationMessage("State")</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    Pincode<span class="required">*</span>
+                                </label>
+                                <input type="text" 
+                                       name="Pincode" 
+                                       value="@Model.Pincode" 
+                                       class="form-control" 
+                                       maxlength="6" 
+                                       pattern="[0-9]{6}" 
+                                       required />
+                                <span class="text-danger">@Html.ValidationMessage("Pincode")</span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    Website<span class="optional-label">(Optional)</span>
+                                </label>
+                                <input type="url" 
+                                       name="Website" 
+                                       value="@Model.Website" 
+                                       class="form-control" />
+                                <span class="text-danger">@Html.ValidationMessage("Website")</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            New Logo<span class="optional-label">(Optional)</span>
+                        </label>
+                        <input type="file" 
+                               name="Logo" 
+                               class="form-control" 
+                               accept="image/*" />
+                        <small class="form-text">Accepted formats: JPG, JPEG, PNG, GIF. Max size: 5MB</small>
+                        <span class="text-danger">@Html.ValidationMessage("Logo")</span>
+                    </div>
+                </div>
+            }
+
+            <!-- Actions -->
+            <div class="edit-section action-section">
+                <div class="action-buttons">
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                    <a href="@Url.Action("Index", "Profile")" class="btn btn-outline-secondary">Cancel</a>
+                </div>
+            </div>
+        </form>
     </div>
 </div>
 

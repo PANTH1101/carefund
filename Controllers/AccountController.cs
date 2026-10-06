@@ -160,7 +160,11 @@ namespace NGODonationSystem.Controllers
                     {
                         Name = model.NGOName,
                         Description = model.Description,
-                        ContactInformation = model.ContactInformation,
+                        Address = model.Address,
+                        City = model.City,
+                        State = model.State,
+                        Pincode = model.Pincode,
+                        Website = string.IsNullOrWhiteSpace(model.Website) ? null : model.Website,
                         VerificationStatus = "Pending",
                         UserId = user.Id
                     };

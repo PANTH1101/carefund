@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using NGODonationSystem.ValidationAttributes;
 
 namespace NGODonationSystem.ViewModels
 {
@@ -20,31 +21,33 @@ namespace NGODonationSystem.ViewModels
         public string? NGOName { get; set; }
 
         [StringLength(2000, ErrorMessage = "Description cannot exceed 2000 characters")]
-        [Display(Name = "Description / About")]
+        [Display(Name = "Description")]
         public string? Description { get; set; }
 
-        [StringLength(500, ErrorMessage = "Contact Information cannot exceed 500 characters")]
-        [Display(Name = "Contact Information")]
-        public string? ContactInformation { get; set; }
+        [StringLength(500, ErrorMessage = "Address cannot exceed 500 characters")]
+        [Display(Name = "Address")]
+        public string? Address { get; set; }
+
+        [StringLength(100, ErrorMessage = "City cannot exceed 100 characters")]
+        [Display(Name = "City")]
+        public string? City { get; set; }
+
+        [StringLength(100, ErrorMessage = "State cannot exceed 100 characters")]
+        [Display(Name = "State")]
+        public string? State { get; set; }
+
+        [IndianPincode(ErrorMessage = "Pincode must be a valid 6-digit Indian PIN code")]
+        [Display(Name = "Pincode")]
+        public string? Pincode { get; set; }
+
+        [Url(ErrorMessage = "Please enter a valid URL")]
+        [StringLength(200, ErrorMessage = "Website URL cannot exceed 200 characters")]
+        [Display(Name = "Website")]
+        public string? Website { get; set; }
 
         [Display(Name = "New Logo")]
         public IFormFile? Logo { get; set; }
 
-        // Verification resubmission (for rejected NGOs)
-        [Display(Name = "Verification Documents")]
-        public List<IFormFile>? VerificationDocuments { get; set; }
-
-        public string? VerificationStatus { get; set; }
-
-        public List<NGODocumentInfo>? ExistingDocuments { get; set; }
-
         public bool IsNGO { get; set; }
-    }
-
-    public class NGODocumentInfo
-    {
-        public int Id { get; set; }
-        public string FileName { get; set; } = string.Empty;
-        public string ContentType { get; set; } = string.Empty;
     }
 }

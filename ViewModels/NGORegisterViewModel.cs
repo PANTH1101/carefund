@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using NGODonationSystem.ValidationAttributes;
 
 namespace NGODonationSystem.ViewModels
 {
@@ -40,13 +41,33 @@ namespace NGODonationSystem.ViewModels
 
         [Required(ErrorMessage = "Description is required")]
         [StringLength(2000, ErrorMessage = "Description cannot exceed 2000 characters")]
-        [Display(Name = "Description / About")]
+        [Display(Name = "Description")]
         public string Description { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Contact Information is required")]
-        [StringLength(500, ErrorMessage = "Contact Information cannot exceed 500 characters")]
-        [Display(Name = "Contact Information")]
-        public string ContactInformation { get; set; } = string.Empty;
+        [Required(ErrorMessage = "Address is required")]
+        [StringLength(500, ErrorMessage = "Address cannot exceed 500 characters")]
+        [Display(Name = "Address")]
+        public string Address { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "City is required")]
+        [StringLength(100, ErrorMessage = "City cannot exceed 100 characters")]
+        [Display(Name = "City")]
+        public string City { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "State is required")]
+        [StringLength(100, ErrorMessage = "State cannot exceed 100 characters")]
+        [Display(Name = "State")]
+        public string State { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Pincode is required")]
+        [IndianPincode(ErrorMessage = "Pincode must be a valid 6-digit Indian PIN code")]
+        [Display(Name = "Pincode")]
+        public string Pincode { get; set; } = string.Empty;
+
+        [Url(ErrorMessage = "Please enter a valid URL")]
+        [StringLength(200, ErrorMessage = "Website URL cannot exceed 200 characters")]
+        [Display(Name = "Website")]
+        public string? Website { get; set; }
 
         [Display(Name = "Logo")]
         public IFormFile? Logo { get; set; }
