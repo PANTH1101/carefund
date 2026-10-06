@@ -58,7 +58,7 @@
                     <tr>
                         <th>NGO Name</th>
                         <th>Contact Email</th>
-                        <th>Contact Information</th>
+                        <th>Location</th>
                         <th>Status</th>
                         <th>Documents</th>
                         <th>Actions</th>
@@ -73,7 +73,20 @@
                             </td>
                             <td>@ngo.User.Email</td>
                             <td>
-                                <small class="text-muted">@(ngo.ContactInformation.Length > 50 ? ngo.ContactInformation.Substring(0, 50) + "..." : ngo.ContactInformation)</small>
+                                <small class="text-muted">
+                                    @if (!string.IsNullOrEmpty(ngo.City) && !string.IsNullOrEmpty(ngo.State))
+                                    {
+                                        @($"{ngo.City}, {ngo.State}")
+                                    }
+                                    else if (!string.IsNullOrEmpty(ngo.ContactInformation))
+                                    {
+                                        @(ngo.ContactInformation.Length > 50 ? ngo.ContactInformation.Substring(0, 50) + "..." : ngo.ContactInformation)
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted fst-italic">Not provided</span>
+                                    }
+                                </small>
                             </td>
                             <td>
                                 @if (ngo.VerificationStatus == "Approved")
